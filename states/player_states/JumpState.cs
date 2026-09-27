@@ -1,64 +1,48 @@
+// res://states/player_states/JumpState.cs
 using Godot;
 
-// res://states/player_states/JumpState.cs
-public class JumpState : PlayerState
+/// <summary>
+/// Estado de salto (Jump) del jugador.
+/// </summary>
+public class JumpState : IState
 {
+    private const string ANIM_JUMP = "jump";
     private readonly Character _owner;
-    private const float JUMP_VELOCITY = -400.0f;
-    private float _gravity = ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle();
+    [Export] private float _jumpForce = -400f;
 
     public JumpState(Character owner) => _owner = owner;
 
-    public override void Enter()
+    public void Enter()
     {
+        _owner.Sprite.Play(ANIM_JUMP);
+        Vector2 velocity = _owner.Velocity;
+        velocity.Y = _jumpForce;
+        _owner.Velocity = velocity;
+    }
+
+    public void Update(double delta)
+    {
+        if (Input.IsActionPressed("player_attack") || Input.IsMouseButtonPressed(MouseButton.Left))
+        {
+            _owner.StateMachine.TransitionTo("Attack");
+            return;
+        }
+
         if (_owner.IsOnFloor())
         {
-            Vector2 velocity = _owner.Velocity;
-            velocity.Y = JUMP_VELOCITY;
-            _owner.Velocity = velocity;
-        }
-        _owner.Sprite.Play(ANIM_JUMP);
-    }
-
-    public override void Update(double delta)
-    {
-        if (_owner.IsOnFloor() && _owner.Velocity.Y >= 0)
-        {
-            if (Mathf.IsZeroApprox(Input.GetAxis("Player1_move_left", "Player1_move_right")))
-                _owner.StateMachine.TransitionTo("Idle");
-            else
-                _owner.StateMachine.TransitionTo("Run");
+            _owner.StateMachine.TransitionTo("Idle");
         }
     }
 
-    public override void PhysicsUpdate(double delta)
+    public void PhysicsUpdate(double delta)
     {
+        float direction = Input.GetAxis("player_left", "player_right");
         Vector2 velocity = _owner.Velocity;
-
-        // Gravedad
-        if (!_owner.IsOnFloor())
-        {
-            velocity.Y += _gravity * (float)delta;
-            
-            // Animación de caída
-            if (velocity.Y > 0 && _owner.Sprite.Animation != ANIM_FALL)
-            {
-                _owner.Sprite.Play(ANIM_FALL);
-            }
-        }
-
-        // Movimiento aéreo (opcionalmente más lento o con inercia)
-        float inputAxis = Input.GetAxis("Player1_move_left", "Player1_move_right");
-        velocity.X = inputAxis * _owner.Speed;
-
-        if (inputAxis != 0)
-        {
-            _owner.Sprite.FlipH = inputAxis < 0;
-        }
-
+        velocity.X = direction * _owner.Speed;
+        velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
         _owner.Velocity = velocity;
         _owner.MoveAndSlide();
     }
 
-    public override void Exit() { }
+    public void Exit() { }
 }

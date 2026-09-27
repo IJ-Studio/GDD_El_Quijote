@@ -8,5 +8,7 @@
     <RootNamespace>ElQuijote</RootNamespace>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="gdUnit4.api" Version="*"
+                      Condition="'$(Configuration)'=='Debug'" />
   </ItemGroup>
 </Project>

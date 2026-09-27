@@ -1,3 +1,4 @@
+// res://autoload/GameManager.cs
 using Godot;
 
 /// <summary>
@@ -28,8 +29,8 @@ public partial class GameManager : Node
     public void StartGame()
     {
         Lives = 5; 
-        HasKey = false; 
-        HasCure = false; 
+        HasKey = false;
+        HasCure = false;
         CurrentLevel = 1;
         TransitionState(GameState.Playing);
         GetTree().ChangeSceneToFile(GetLevelScenePath(CurrentLevel));
@@ -41,9 +42,9 @@ public partial class GameManager : Node
     private void OnPlayerDied(Character _)
     {
         Lives = Mathf.Max(0, Lives - 1);
-        if (Lives <= 0) 
+        if (Lives <= 0)
             TransitionState(GameState.GameOver);
-        else            
+        else
             GetTree().ReloadCurrentScene();
     }
 
@@ -68,7 +69,7 @@ public partial class GameManager : Node
     private static string GetLevelScenePath(int level) => level switch
     {
         1 => "res://levels/Level1Almacen.tscn",
-        2 => "res://levels/Level2BovedaDeLaCura.tscn",
+        2 => "res://levels/Level2BovedaDeLaCura.tscn",    
         3 => "res://levels/Level3Cocina.tscn",
         _ => "res://levels/Level1Almacen.tscn"
     };
