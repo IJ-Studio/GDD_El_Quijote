@@ -1,3 +1,4 @@
+// res://autoload/EventBus.cs
 using Godot;
 
 /// <summary>

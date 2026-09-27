@@ -1,3 +1,4 @@
+// res://entities/Character.cs
 using Godot;
 
 /// <summary>
@@ -14,8 +15,8 @@ public abstract partial class Character : CharacterBody2D
     public int CurrentHealth { get; protected set; }
 
     // ── Dependencias internas ──────────────────────────────────────
-    protected StateMachine  StateMachine = null!;
-    protected AnimatedSprite2D Sprite    = null!;
+    public StateMachine  StateMachine { get; protected set; } = null!;
+    public AnimatedSprite2D Sprite    { get; protected set; } = null!;
 
     public override void _Ready()
     {

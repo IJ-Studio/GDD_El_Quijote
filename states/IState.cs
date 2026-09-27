@@ -1,3 +1,5 @@
+// res://states/IState.cs
+
 /// <summary>
 /// Contrato que todo estado de la FSM debe implementar.
 /// Los estados son clases C# puras — no heredan de Node.

@@ -1,3 +1,4 @@
+// res://entities/enemies/Enemy.cs
 using Godot;
 
 /// <summary>
