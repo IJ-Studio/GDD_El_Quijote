@@ -1,3 +1,4 @@
+// res://autoload/GameManager.cs
 using Godot;
 
 /// <summary>
@@ -10,6 +11,7 @@ public partial class GameManager : Node
 
     // ── Estado persistente entre escenas ──────────────────────────
     public int  Lives        { get; private set; } = 5;
+    public int  CurrentLives => Lives;
     public bool HasKey       { get; private set; } = false;
     public bool HasCure      { get; private set; } = false;
     public int  CurrentLevel { get; private set; } = 1;
@@ -28,8 +30,8 @@ public partial class GameManager : Node
     public void StartGame()
     {
         Lives = 5; 
-        HasKey = false; 
-        HasCure = false; 
+        HasKey = false;
+        HasCure = false;
         CurrentLevel = 1;
         TransitionState(GameState.Playing);
         GetTree().ChangeSceneToFile(GetLevelScenePath(CurrentLevel));
@@ -38,13 +40,25 @@ public partial class GameManager : Node
     public void PauseGame()  => TransitionState(GameState.Paused);
     public void ResumeGame() => TransitionState(GameState.Playing);
 
-    private void OnPlayerDied(Character _)
+    /// <summary>
+    /// Pierde una vida. Transiciona a GameOver si llega a 0, o recarga la escena actual.
+    /// </summary>
+    public void LoseLife()
     {
         Lives = Mathf.Max(0, Lives - 1);
-        if (Lives <= 0) 
+        if (Lives <= 0)
+        {
             TransitionState(GameState.GameOver);
-        else            
+        }
+        else
+        {
             GetTree().ReloadCurrentScene();
+        }
+    }
+
+    private void OnPlayerDied(Character _)
+    {
+        LoseLife();
     }
 
     private void OnKeyCollected()          => HasKey  = true;
@@ -68,7 +82,7 @@ public partial class GameManager : Node
     private static string GetLevelScenePath(int level) => level switch
     {
         1 => "res://levels/Level1Almacen.tscn",
-        2 => "res://levels/Level2BovedaDeLaCura.tscn",
+        2 => "res://levels/Level2BovedaDeLaCura.tscn",    
         3 => "res://levels/Level3Cocina.tscn",
         _ => "res://levels/Level1Almacen.tscn"
     };
