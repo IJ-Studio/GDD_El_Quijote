@@ -11,6 +11,7 @@ public partial class GameManager : Node
 
     // ── Estado persistente entre escenas ──────────────────────────
     public int  Lives        { get; private set; } = 5;
+    public int  CurrentLives => Lives;
     public bool HasKey       { get; private set; } = false;
     public bool HasCure      { get; private set; } = false;
     public int  CurrentLevel { get; private set; } = 1;
@@ -39,13 +40,25 @@ public partial class GameManager : Node
     public void PauseGame()  => TransitionState(GameState.Paused);
     public void ResumeGame() => TransitionState(GameState.Playing);
 
-    private void OnPlayerDied(Character _)
+    /// <summary>
+    /// Pierde una vida. Transiciona a GameOver si llega a 0, o recarga la escena actual.
+    /// </summary>
+    public void LoseLife()
     {
         Lives = Mathf.Max(0, Lives - 1);
         if (Lives <= 0)
+        {
             TransitionState(GameState.GameOver);
+        }
         else
+        {
             GetTree().ReloadCurrentScene();
+        }
+    }
+
+    private void OnPlayerDied(Character _)
+    {
+        LoseLife();
     }
 
     private void OnKeyCollected()          => HasKey  = true;
