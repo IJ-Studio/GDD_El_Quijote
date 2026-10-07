@@ -5,12 +5,23 @@ using Godot;
 /// Estado de ataque del jugador. Activa la Hitbox solo durante los frames de ataque
 /// y transiciona automáticamente a Idle cuando termina la animación.
 /// </summary>
-public class AttackState : IState
+public partial class AttackState : Node, IState
 {
     private const string ANIM_ATTACK = "attack";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
+    public AttackState() { }
     public AttackState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {

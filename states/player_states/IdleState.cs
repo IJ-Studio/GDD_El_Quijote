@@ -5,12 +5,23 @@ using Godot;
 /// Estado de reposo (Idle) del jugador.
 /// Transiciona a Run, Jump, Crouch, Attack o Block según el input.
 /// </summary>
-public class IdleState : IState
+public partial class IdleState : Node, IState
 {
     private const string ANIM_IDLE = "idle";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
+    public IdleState() { }
     public IdleState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {

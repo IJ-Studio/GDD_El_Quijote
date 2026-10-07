@@ -5,12 +5,23 @@ using Godot;
 /// Estado de retroceso (Hurt) al recibir daño.
 /// Reproduce la animación de daño y regresa a Idle al finalizar.
 /// </summary>
-public class HurtState : IState
+public partial class HurtState : Node, IState
 {
     private const string ANIM_HURT = "hurt";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
+    public HurtState() { }
     public HurtState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {

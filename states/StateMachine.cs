@@ -5,7 +5,7 @@ using Godot;
 
 /// <summary>
 /// Motor genérico de la FSM. Se registra como hijo del nodo Character en la escena.
-/// Los estados se registran por código en Character._Ready() → InitializeStates().
+/// Los estados se registran por código o se descubren automáticamente como nodos hijos.
 /// </summary>
 public partial class StateMachine : Node
 {
@@ -13,6 +13,18 @@ public partial class StateMachine : Node
     private Dictionary<string, IState>  _states = new();
 
     [Export] public string InitialState { get; set; } = "Idle";
+
+    public override void _Ready()
+    {
+        // Auto-registrar nodos hijos que implementen IState
+        foreach (Node child in GetChildren())
+        {
+            if (child is IState state)
+            {
+                RegisterState(child.Name, state);
+            }
+        }
+    }
 
     public void RegisterState(string name, IState state) => _states[name] = state;
 

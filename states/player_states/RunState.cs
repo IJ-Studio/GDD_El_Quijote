@@ -4,12 +4,23 @@ using Godot;
 /// <summary>
 /// Estado de carrera (Run) del jugador.
 /// </summary>
-public class RunState : IState
+public partial class RunState : Node, IState
 {
     private const string ANIM_RUN = "run";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
+    public RunState() { }
     public RunState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {

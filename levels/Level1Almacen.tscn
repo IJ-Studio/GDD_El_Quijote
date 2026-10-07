@@ -1,0 +1,125 @@
+[gd_scene format=3 uid="uid://baotfqj1ap2hp"]
+
+[ext_resource type="PackedScene" path="res://ui/Hud.tscn" id="1_hud"]
+[ext_resource type="Script" uid="uid://cprpwr3c5hp6t" path="res://entities/players/DonQuijote.cs" id="2_player"]
+[ext_resource type="Script" uid="uid://bpjx23m6y18xw" path="res://states/StateMachine.cs" id="3_statemachine"]
+[ext_resource type="Script" uid="uid://bxr7geqedep8e" path="res://states/player_states/IdleState.cs" id="4_idle"]
+[ext_resource type="Script" uid="uid://cxppmtswq1jb0" path="res://states/player_states/RunState.cs" id="5_run"]
+[ext_resource type="Script" uid="uid://clrjuwv5mwioj" path="res://states/player_states/JumpState.cs" id="6_jump"]
+[ext_resource type="Script" uid="uid://c7riva26xu6o4" path="res://states/player_states/FallState.cs" id="7_fall"]
+[ext_resource type="Script" uid="uid://c4fnp0arcgdgv" path="res://states/player_states/AttackState.cs" id="8_attack"]
+[ext_resource type="Script" uid="uid://mewao7gca5vk" path="res://states/player_states/DeadState.cs" id="9_dead"]
+[ext_resource type="Script" uid="uid://dfhqtxqykueik" path="res://combat/Hitbox.cs" id="10_hitbox"]
+[ext_resource type="Script" uid="uid://cxr04m0kgylvf" path="res://combat/Hurtbox.cs" id="11_hurtbox"]
+[ext_resource type="Script" uid="uid://citlr0vs1um1j" path="res://levels/TestHazard.cs" id="12_hazard"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
+size = Vector2(1000, 50)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_tft2s"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
+size = Vector2(32, 64)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
+size = Vector2(40, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
+size = Vector2(36, 68)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_hazard"]
+size = Vector2(32, 32)
+
+[node name="Level1Almacen" type="Node2D" unique_id=288193213]
+
+[node name="Hud" parent="." unique_id=624475882 instance=ExtResource("1_hud")]
+
+[node name="Floor" type="StaticBody2D" parent="." unique_id=1549022503]
+position = Vector2(500, 400)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1706421034]
+shape = SubResource("RectangleShape2D_floor")
+
+[node name="ColorRect" type="ColorRect" parent="Floor" unique_id=272657535]
+offset_left = -500.0
+offset_top = -25.0
+offset_right = 500.0
+offset_bottom = 25.0
+color = Color(0.243137, 0.180392, 0.129412, 1)
+
+[node name="DonQuijote" type="CharacterBody2D" parent="." unique_id=1053661112]
+position = Vector2(200, 200)
+script = ExtResource("2_player")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="DonQuijote" unique_id=1352948020]
+sprite_frames = SubResource("SpriteFrames_tft2s")
+animation = &"idle"
+
+[node name="StateMachine" type="Node" parent="DonQuijote" unique_id=1680407067]
+script = ExtResource("3_statemachine")
+
+[node name="Idle" type="Node" parent="DonQuijote/StateMachine" unique_id=1303591691]
+script = ExtResource("4_idle")
+
+[node name="Run" type="Node" parent="DonQuijote/StateMachine" unique_id=1784181179]
+script = ExtResource("5_run")
+
+[node name="Jump" type="Node" parent="DonQuijote/StateMachine" unique_id=132842977]
+script = ExtResource("6_jump")
+
+[node name="Fall" type="Node" parent="DonQuijote/StateMachine" unique_id=1871988732]
+script = ExtResource("7_fall")
+
+[node name="Attack" type="Node" parent="DonQuijote/StateMachine" unique_id=1389063636]
+script = ExtResource("8_attack")
+
+[node name="Dead" type="Node" parent="DonQuijote/StateMachine" unique_id=2049442050]
+script = ExtResource("9_dead")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DonQuijote" unique_id=1238745054]
+shape = SubResource("RectangleShape2D_player")
+
+[node name="ColorRect" type="ColorRect" parent="DonQuijote" unique_id=222788426]
+offset_left = -16.0
+offset_top = -32.0
+offset_right = 16.0
+offset_bottom = 32.0
+color = Color(0, 0.478431, 1, 1)
+
+[node name="Camera2D" type="Camera2D" parent="DonQuijote" unique_id=2083586194]
+zoom = Vector2(1.5, 1.5)
+process_callback = 0
+position_smoothing_enabled = true
+
+[node name="Hitbox" type="Area2D" parent="DonQuijote" unique_id=1191034925]
+script = ExtResource("10_hitbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DonQuijote/Hitbox" unique_id=1436009070]
+position = Vector2(24, 0)
+shape = SubResource("RectangleShape2D_hitbox")
+
+[node name="Hurtbox" type="Area2D" parent="DonQuijote" unique_id=896267815]
+script = ExtResource("11_hurtbox")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="DonQuijote/Hurtbox" unique_id=19604426]
+shape = SubResource("RectangleShape2D_hurtbox")
+
+[node name="TestHazard" type="Area2D" parent="." unique_id=2085174225]
+position = Vector2(400, 350)
+script = ExtResource("12_hazard")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="TestHazard" unique_id=1082610034]
+shape = SubResource("RectangleShape2D_hazard")
+
+[node name="ColorRect" type="ColorRect" parent="TestHazard" unique_id=1462518871]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(0.8, 0.2, 0.2, 1)

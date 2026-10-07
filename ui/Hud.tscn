@@ -1,0 +1,45 @@
+[gd_scene load_steps=2 format=3 uid="uid://hud_scene_uid"]
+
+[ext_resource type="Script" path="res://ui/Hud.cs" id="1_hud"]
+
+[node name="Hud" type="CanvasLayer"]
+script = ExtResource("1_hud")
+_livesLabel = NodePath("MarginContainer/VBoxContainer/LivesLabel")
+_healthBar = NodePath("MarginContainer/VBoxContainer/HealthBar")
+_keyIcon = NodePath("MarginContainer/VBoxContainer/IconsContainer/KeyIcon")
+_cureIcon = NodePath("MarginContainer/VBoxContainer/IconsContainer/CureIcon")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 16
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 16
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="HealthBar" type="ProgressBar" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+value = 100.0
+
+[node name="LivesLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "Vidas: 5"
+
+[node name="IconsContainer" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="KeyIcon" type="TextureRect" parent="MarginContainer/VBoxContainer/IconsContainer"]
+visible = false
+layout_mode = 2
+
+[node name="CureIcon" type="TextureRect" parent="MarginContainer/VBoxContainer/IconsContainer"]
+visible = false
+layout_mode = 2

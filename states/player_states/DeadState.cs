@@ -5,12 +5,23 @@ using Godot;
 /// Estado de muerte (Dead) del personaje.
 /// Emite PlayerDied al EventBus.
 /// </summary>
-public class DeadState : IState
+public partial class DeadState : Node, IState
 {
     private const string ANIM_DEAD = "death";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
+    public DeadState() { }
     public DeadState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {

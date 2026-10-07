@@ -7,4 +7,8 @@
     <EnableDynamicLoading>true</EnableDynamicLoading>
     <RootNamespace>ElQuijote</RootNamespace>
   </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="GdUnit4" Version="*" Condition="'$(Configuration)'=='Debug'" />
+  </ItemGroup>
 </Project>

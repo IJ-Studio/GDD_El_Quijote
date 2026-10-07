@@ -15,6 +15,23 @@ public partial class Hud : CanvasLayer
 
     public override void _Ready()
     {
+        // Fallback dinámico si no están asignados por Export o Path en .tscn
+        _livesLabel ??= GetNodeOrNull<Label>("MarginContainer/VBoxContainer/LivesLabel") 
+                          ?? GetNodeOrNull<Label>("VBoxContainer/LivesLabel") 
+                          ?? GetNodeOrNull<Label>("LivesLabel");
+
+        _healthBar  ??= GetNodeOrNull<ProgressBar>("MarginContainer/VBoxContainer/HealthBar") 
+                          ?? GetNodeOrNull<ProgressBar>("VBoxContainer/HealthBar") 
+                          ?? GetNodeOrNull<ProgressBar>("HealthBar");
+
+        _keyIcon    ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/KeyIcon") 
+                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/KeyIcon") 
+                          ?? GetNodeOrNull<TextureRect>("KeyIcon");
+
+        _cureIcon   ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/CureIcon") 
+                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/CureIcon") 
+                          ?? GetNodeOrNull<TextureRect>("CureIcon");
+
         EventBus.Instance.HealthChanged     += OnHealthChanged;
         EventBus.Instance.KeyCollected      += OnKeyCollected;
         EventBus.Instance.CureCollected     += OnCureCollected;
@@ -51,15 +68,8 @@ public partial class Hud : CanvasLayer
         if (_cureIcon is not null) _cureIcon.Visible = true;
     }
 
-    private void OnAdrenalineStarted()
-    {
-        // Indicador visual de adrenalina en HUD
-    }
-
-    private void OnAdrenalineEnded()
-    {
-        // Revertir indicador visual de adrenalina en HUD
-    }
+    private void OnAdrenalineStarted() { }
+    private void OnAdrenalineEnded()   { }
 
     private void UpdateLivesDisplay()
     {

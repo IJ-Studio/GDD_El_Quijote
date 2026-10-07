@@ -4,12 +4,23 @@ using Godot;
 /// <summary>
 /// Estado de agachado (Crouch) del jugador.
 /// </summary>
-public class CrouchState : IState
+public partial class CrouchState : Node, IState
 {
     private const string ANIM_CROUCH = "crouch";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
+    public CrouchState() { }
     public CrouchState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {

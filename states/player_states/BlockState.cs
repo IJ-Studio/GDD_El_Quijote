@@ -6,15 +6,26 @@ using Godot;
 /// Soporta bloqueo normal y bloqueo en arco / aéreo (K sostenido + Flecha Arriba / W).
 /// Reduce o anula el daño recibido mientras está activo.
 /// </summary>
-public class BlockState : IState
+public partial class BlockState : Node, IState
 {
     private const string ANIM_BLOCK = "block";
     private const string ANIM_BLOCK_HIGH = "block_high";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
     public bool IsHighBlock { get; private set; } = false;
 
+    public BlockState() { }
     public BlockState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {
@@ -24,7 +35,6 @@ public class BlockState : IState
 
     public void Update(double delta)
     {
-        // Actualizar tipo de bloqueo si presiona arriba/W manteniendo bloqueado
         bool wasHigh = IsHighBlock;
         IsHighBlock = Input.IsActionPressed("player_jump") || Input.IsActionPressed("ui_up");
         if (wasHigh != IsHighBlock)
@@ -32,7 +42,6 @@ public class BlockState : IState
             UpdateBlockAnimation();
         }
 
-        // Salir del bloqueo al soltar K o clic derecho
         if (!Input.IsActionPressed("player_block") && !Input.IsMouseButtonPressed(MouseButton.Right))
         {
             _owner.StateMachine.TransitionTo("Idle");
@@ -68,10 +77,6 @@ public class BlockState : IState
         IsHighBlock = false;
     }
 
-    /// <summary>
-    /// Calcula el daño modificado mientras se bloquea.
-    /// Bloqueo normal reduce un 50%. Bloqueo alto/aéreo reduce un 100% contra proyectiles o ataques superiores.
-    /// </summary>
     public int ModifyDamage(int incomingDamage)
     {
         return IsHighBlock ? 0 : incomingDamage / 2;
