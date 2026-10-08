@@ -48,7 +48,7 @@ public partial class FallState : Node, IState
     public void PhysicsUpdate(double delta)
     {
         if (_owner == null) return;
-        float direction = Input.GetAxis("player_left", "player_right");
+        float direction = _owner.GetAxis("left", "right");
         Vector2 velocity = _owner.Velocity;
         velocity.X = direction * _owner.Speed;
         velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);

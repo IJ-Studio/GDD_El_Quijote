@@ -33,7 +33,7 @@ public partial class JumpState : Node, IState
 
     public void Update(double delta)
     {
-        if (Input.IsActionPressed("player_attack") || Input.IsMouseButtonPressed(MouseButton.Left))
+        if (_owner.IsActionPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
         {
             _owner.StateMachine.TransitionTo("Attack");
             return;
@@ -47,7 +47,7 @@ public partial class JumpState : Node, IState
 
     public void PhysicsUpdate(double delta)
     {
-        float direction = Input.GetAxis("player_left", "player_right");
+        float direction = _owner.GetAxis("left", "right");
         Vector2 velocity = _owner.Velocity;
         velocity.X = direction * _owner.Speed;
         velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);

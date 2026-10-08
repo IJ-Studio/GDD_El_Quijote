@@ -12,6 +12,7 @@
 [ext_resource type="Script" uid="uid://dfhqtxqykueik" path="res://combat/Hitbox.cs" id="10_hitbox"]
 [ext_resource type="Script" uid="uid://cxr04m0kgylvf" path="res://combat/Hurtbox.cs" id="11_hurtbox"]
 [ext_resource type="Script" uid="uid://citlr0vs1um1j" path="res://levels/TestHazard.cs" id="12_hazard"]
+[ext_resource type="PackedScene" path="res://entities/players/SanchoPanza.tscn" id="13_sanchopanza"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(1000, 50)
@@ -123,3 +124,6 @@ offset_top = -16.0
 offset_right = 16.0
 offset_bottom = 16.0
 color = Color(0.8, 0.2, 0.2, 1)
+
+[node name="SanchoPanza" parent="." instance=ExtResource("13_sanchopanza")]
+position = Vector2(260, 200)

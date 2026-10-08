@@ -12,6 +12,7 @@ public abstract partial class Character : CharacterBody2D
     [Export] public float Speed     { get; protected set; } = 150f;
     [Export] public int   MaxHealth { get; protected set; } = 100;
     [Export] public float InvulnerabilityDuration { get; set; } = 0.5f;
+    [Export] public string InputPrefix { get; set; } = "player1_";
 
     // ── Estado en tiempo de ejecución ─────────────────────────────
     public int CurrentHealth { get; protected set; }
@@ -54,6 +55,34 @@ public abstract partial class Character : CharacterBody2D
                 Sprite.Modulate = new Color(1f, 1f, 1f, alpha);
             }
         }
+    }
+
+    public bool IsActionPressed(string action)
+    {
+        string cleanAction = action.StartsWith("player_") ? action.Substring(7) : action;
+        return Input.IsActionPressed(InputPrefix + cleanAction) || Input.IsActionPressed("player_" + cleanAction) || Input.IsActionPressed(cleanAction);
+    }
+
+    public bool IsActionJustPressed(string action)
+    {
+        string cleanAction = action.StartsWith("player_") ? action.Substring(7) : action;
+        return Input.IsActionJustPressed(InputPrefix + cleanAction) || Input.IsActionJustPressed("player_" + cleanAction) || Input.IsActionJustPressed(cleanAction);
+    }
+
+    public float GetAxis(string negAction, string posAction)
+    {
+        string cleanNeg = negAction.StartsWith("player_") ? negAction.Substring(7) : negAction;
+        string cleanPos = posAction.StartsWith("player_") ? posAction.Substring(7) : posAction;
+        float val = Input.GetAxis(InputPrefix + cleanNeg, InputPrefix + cleanPos);
+        if (Mathf.IsZeroApprox(val))
+        {
+            val = Input.GetAxis("player_" + cleanNeg, "player_" + cleanPos);
+        }
+        if (Mathf.IsZeroApprox(val))
+        {
+            val = Input.GetAxis(cleanNeg, cleanPos);
+        }
+        return val;
     }
 
     /// <summary>Cada subclase registra sus propios estados en la FSM.</summary>

@@ -29,25 +29,25 @@ public partial class RunState : Node, IState
 
     public void Update(double delta)
     {
-        if (Input.IsActionPressed("player_attack") || Input.IsMouseButtonPressed(MouseButton.Left))
+        if (_owner.IsActionPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
         {
             _owner.StateMachine.TransitionTo("Attack");
             return;
         }
 
-        if (Input.IsActionPressed("player_block") || Input.IsMouseButtonPressed(MouseButton.Right))
+        if (_owner.IsActionPressed("block") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Right)))
         {
             _owner.StateMachine.TransitionTo("Block");
             return;
         }
 
-        if (Input.IsActionJustPressed("player_jump") && _owner.IsOnFloor())
+        if (_owner.IsActionJustPressed("jump") && _owner.IsOnFloor())
         {
             _owner.StateMachine.TransitionTo("Jump");
             return;
         }
 
-        float direction = Input.GetAxis("player_left", "player_right");
+        float direction = _owner.GetAxis("left", "right");
         if (Mathf.IsZeroApprox(direction))
         {
             _owner.StateMachine.TransitionTo("Idle");
@@ -60,7 +60,7 @@ public partial class RunState : Node, IState
 
     public void PhysicsUpdate(double delta)
     {
-        float direction = Input.GetAxis("player_left", "player_right");
+        float direction = _owner.GetAxis("left", "right");
         Vector2 velocity = _owner.Velocity;
         velocity.X = direction * _owner.Speed;
 

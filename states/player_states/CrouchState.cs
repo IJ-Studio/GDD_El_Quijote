@@ -30,7 +30,7 @@ public partial class CrouchState : Node, IState
 
     public void Update(double delta)
     {
-        if (!Input.IsActionPressed("player_crouch") || !_owner.IsOnFloor())
+        if (!_owner.IsActionPressed("crouch") || !_owner.IsOnFloor())
         {
             _owner.StateMachine.TransitionTo("Idle");
         }

@@ -36,13 +36,13 @@ public partial class BlockState : Node, IState
     public void Update(double delta)
     {
         bool wasHigh = IsHighBlock;
-        IsHighBlock = Input.IsActionPressed("player_jump") || Input.IsActionPressed("ui_up");
+        IsHighBlock = _owner.IsActionPressed("jump") || _owner.IsActionPressed("ui_up");
         if (wasHigh != IsHighBlock)
         {
             UpdateBlockAnimation();
         }
 
-        if (!Input.IsActionPressed("player_block") && !Input.IsMouseButtonPressed(MouseButton.Right))
+        if (!_owner.IsActionPressed("block") && !(_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Right)))
         {
             _owner.StateMachine.TransitionTo("Idle");
         }

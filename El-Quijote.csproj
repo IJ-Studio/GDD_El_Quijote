@@ -9,6 +9,6 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="GdUnit4" Version="*" Condition="'$(Configuration)'=='Debug'" />
+    <PackageReference Include="GdUnit4" Version="4.3.0" Condition="'$(Configuration)'=='Debug'" />
   </ItemGroup>
 </Project>
