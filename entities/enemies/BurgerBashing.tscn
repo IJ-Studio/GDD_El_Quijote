@@ -1,0 +1,10 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Scene" path="res://entities/enemies/Enemy.tscn" id="1_enemy"]
+[ext_resource type="Script" path="res://entities/enemies/BurgerBashing.cs" id="2_burger"]
+
+[node name="BurgerBashing" instance=ExtResource("1_enemy")]
+script = ExtResource("2_burger")
+Speed = 120.0
+MaxHealth = 50
+ChargeSpeed = 300.0
