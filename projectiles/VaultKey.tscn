@@ -1,0 +1,34 @@
+[gd_scene format=3 uid="uid://c2vdpn6hn4q0e"]
+
+[ext_resource type="Script" path="res://projectiles/VaultKey.cs" id="1_script"]
+
+[sub_resource type="CircleShape2D" id="CircleShape2D_key"]
+radius = 16.0
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_key"]
+animations = [{
+"frames": [],
+"loop": 1,
+"name": &"idle",
+"speed": 5.0
+}]
+
+[node name="VaultKey" type="Area2D"]
+script = ExtResource("1_script")
+RotationSpeed = 180.0
+BobAmplitude = 10.0
+BobSpeed = 2.0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+shape = SubResource("CircleShape2D_key")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+sprite_frames = SubResource("SpriteFrames_key")
+animation = &"idle"
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -16.0
+offset_top = -16.0
+offset_right = 16.0
+offset_bottom = 16.0
+color = Color(1, 0.843137, 0, 1)

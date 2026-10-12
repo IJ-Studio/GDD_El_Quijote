@@ -13,9 +13,21 @@
 [ext_resource type="Script" uid="uid://cxr04m0kgylvf" path="res://combat/Hurtbox.cs" id="11_hurtbox"]
 [ext_resource type="Script" uid="uid://citlr0vs1um1j" path="res://levels/TestHazard.cs" id="12_hazard"]
 [ext_resource type="PackedScene" path="res://entities/players/SanchoPanza.tscn" id="13_sanchopanza"]
+[ext_resource type="Script" path="res://combat/ProjectilePool.cs" id="14_pool"]
+[ext_resource type="PackedScene" path="res://entities/enemies/SliceOPizza.tscn" id="15_sliceop"]
+[ext_resource type="PackedScene" path="res://entities/enemies/BurgerBashing.tscn" id="16_burger"]
+[ext_resource type="PackedScene" path="res://projectiles/VaultKey.tscn" id="17_key"]
+[ext_resource type="PackedScene" path="res://projectiles/VaultDoor.tscn" id="18_door"]
+[ext_resource type="PackedScene" path="res://projectiles/HiloDeQueso.tscn" id="19_projectile"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
-size = Vector2(1000, 50)
+size = Vector2(1200, 50)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform_mid"]
+size = Vector2(300, 40)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf"]
+size = Vector2(150, 30)
 
 [sub_resource type="SpriteFrames" id="SpriteFrames_tft2s"]
 animations = [{
@@ -41,21 +53,108 @@ size = Vector2(32, 32)
 
 [node name="Hud" parent="." unique_id=624475882 instance=ExtResource("1_hud")]
 
+# ─────────────────────────────────────────────────────────────────
+# ESCENARIO: Piso + Plataformas + Estantes
+# ─────────────────────────────────────────────────────────────────
+
 [node name="Floor" type="StaticBody2D" parent="." unique_id=1549022503]
-position = Vector2(500, 400)
+position = Vector2(600, 500)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1706421034]
 shape = SubResource("RectangleShape2D_floor")
 
 [node name="ColorRect" type="ColorRect" parent="Floor" unique_id=272657535]
-offset_left = -500.0
+offset_left = -600.0
 offset_top = -25.0
-offset_right = 500.0
+offset_right = 600.0
 offset_bottom = 25.0
 color = Color(0.243137, 0.180392, 0.129412, 1)
 
+# Plataforma media (centro del escenario)
+[node name="PlatformMid" type="StaticBody2D" parent="."]
+position = Vector2(600, 350)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformMid"]
+shape = SubResource("RectangleShape2D_platform_mid")
+
+[node name="ColorRect" type="ColorRect" parent="PlatformMid"]
+offset_left = -150.0
+offset_top = -20.0
+offset_right = 150.0
+offset_bottom = 20.0
+color = Color(0.2, 0.3, 0.2, 1)
+
+# Estante izquierdo
+[node name="ShelfLeft" type="StaticBody2D" parent="."]
+position = Vector2(250, 380)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShelfLeft"]
+shape = SubResource("RectangleShape2D_shelf")
+
+[node name="ColorRect" type="ColorRect" parent="ShelfLeft"]
+offset_left = -75.0
+offset_top = -15.0
+offset_right = 75.0
+offset_bottom = 15.0
+color = Color(0.3, 0.25, 0.15, 1)
+
+# Estante derecho
+[node name="ShelfRight" type="StaticBody2D" parent="."]
+position = Vector2(950, 380)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="ShelfRight"]
+shape = SubResource("RectangleShape2D_shelf")
+
+[node name="ColorRect" type="ColorRect" parent="ShelfRight"]
+offset_left = -75.0
+offset_top = -15.0
+offset_right = 75.0
+offset_bottom = 15.0
+color = Color(0.3, 0.25, 0.15, 1)
+
+# Plataforma alta (izquierda)
+[node name="PlatformHighLeft" type="StaticBody2D" parent="."]
+position = Vector2(150, 250)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformHighLeft"]
+shape = SubResource("RectangleShape2D_platform_mid")
+
+[node name="ColorRect" type="ColorRect" parent="PlatformHighLeft"]
+offset_left = -150.0
+offset_top = -20.0
+offset_right = 150.0
+offset_bottom = 20.0
+color = Color(0.2, 0.3, 0.2, 1)
+
+# Plataforma alta (derecha)
+[node name="PlatformHighRight" type="StaticBody2D" parent="."]
+position = Vector2(1050, 250)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformHighRight"]
+shape = SubResource("RectangleShape2D_platform_mid")
+
+[node name="ColorRect" type="ColorRect" parent="PlatformHighRight"]
+offset_left = -150.0
+offset_top = -20.0
+offset_right = 150.0
+offset_bottom = 20.0
+color = Color(0.2, 0.3, 0.2, 1)
+
+# ─────────────────────────────────────────────────────────────────
+# SISTEMA DE OBJETOS: ProjectilePool
+# ─────────────────────────────────────────────────────────────────
+
+[node name="ProjectilePool" type="Node" parent="."]
+script = ExtResource("14_pool")
+PoolSizePerType = 20
+HiloDeQuesoScene = ExtResource("19_projectile")
+
+# ─────────────────────────────────────────────────────────────────
+# JUGADORES
+# ─────────────────────────────────────────────────────────────────
+
 [node name="DonQuijote" type="CharacterBody2D" parent="." unique_id=1053661112]
-position = Vector2(200, 200)
+position = Vector2(100, 350)
 script = ExtResource("2_player")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="DonQuijote" unique_id=1352948020]
@@ -111,8 +210,39 @@ script = ExtResource("11_hurtbox")
 [node name="CollisionShape2D" type="CollisionShape2D" parent="DonQuijote/Hurtbox" unique_id=19604426]
 shape = SubResource("RectangleShape2D_hurtbox")
 
+[node name="SanchoPanza" parent="." instance=ExtResource("13_sanchopanza")]
+position = Vector2(180, 350)
+
+# ─────────────────────────────────────────────────────────────────
+# ENEMIGOS: Guardias del Almacén
+# ─────────────────────────────────────────────────────────────────
+
+# Slice-O-Pizza: Enemigo a distancia (dispara proyectiles)
+[node name="EnemySlice1" parent="." instance=ExtResource("15_sliceop")]
+position = Vector2(750, 320)
+
+# Burger-Bashing: Enemigo de embestida
+[node name="EnemyBurger1" parent="." instance=ExtResource("16_burger")]
+position = Vector2(450, 320)
+
+# ─────────────────────────────────────────────────────────────────
+# OBJETOS ESPECIALES: Llave + Puerta
+# ─────────────────────────────────────────────────────────────────
+
+# Llave de la bóveda (recolectable)
+[node name="VaultKey" parent="." instance=ExtResource("17_key")]
+position = Vector2(600, 280)
+
+# Puerta de salida (se abre con llave)
+[node name="VaultDoor" parent="." instance=ExtResource("18_door")]
+position = Vector2(1150, 400)
+
+# ─────────────────────────────────────────────────────────────────
+# PRUEBAS: Hazard temporal
+# ─────────────────────────────────────────────────────────────────
+
 [node name="TestHazard" type="Area2D" parent="." unique_id=2085174225]
-position = Vector2(400, 350)
+position = Vector2(400, 450)
 script = ExtResource("12_hazard")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TestHazard" unique_id=1082610034]
@@ -124,6 +254,3 @@ offset_top = -16.0
 offset_right = 16.0
 offset_bottom = 16.0
 color = Color(0.8, 0.2, 0.2, 1)
-
-[node name="SanchoPanza" parent="." instance=ExtResource("13_sanchopanza")]
-position = Vector2(260, 200)
