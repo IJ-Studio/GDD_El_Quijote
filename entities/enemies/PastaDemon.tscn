@@ -1,0 +1,13 @@
+[gd_scene load_steps=2 format=3 uid="uid://cod8q7j4bhebp"]
+
+[ext_resource type="Scene" path="res://entities/enemies/Enemy.tscn" id="1_parent"]
+[ext_resource type="Script" path="res://entities/enemies/PastaDemon.cs" id="2_script"]
+
+[node name="PastaDemon" instance=ExtResource("1_parent")]
+script = ExtResource("2_script")
+Speed = 80.0
+MaxHealth = 40
+AttackCooldown = 1.5
+
+[node name="ColorRect" parent="." index="2"]
+color = Color(0.6, 0.3, 0.1, 1)

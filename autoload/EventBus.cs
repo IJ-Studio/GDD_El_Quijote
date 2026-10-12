@@ -16,6 +16,10 @@ public partial class EventBus : Node
     [Signal] public delegate void KeyCollectedEventHandler();
     [Signal] public delegate void CureCollectedEventHandler();
 
+    // ── Señales de puzles ──────────────────────────────────────────
+    [Signal] public delegate void ReversionPlatformActivatedEventHandler();
+    [Signal] public delegate void CureObtainedEventHandler();
+
     // ── Señales de Oleada de Adrenalina ───────────────────────────
     [Signal] public delegate void AdrenalineStartedEventHandler();
     [Signal] public delegate void AdrenalineEndedEventHandler();
@@ -35,6 +39,8 @@ public partial class EventBus : Node
     public void EmitEnemyGroupDefeated()   => EmitSignal(SignalName.EnemyGroupDefeated);
     public void EmitKeyCollected()         => EmitSignal(SignalName.KeyCollected);
     public void EmitCureCollected()        => EmitSignal(SignalName.CureCollected);
+    public void EmitRevisionPlatformActivated() => EmitSignal(SignalName.ReversionPlatformActivated);
+    public void EmitCureObtained()         => EmitSignal(SignalName.CureObtained);
     public void EmitLevelCompleted(int n)  => EmitSignal(SignalName.LevelCompleted, n);
     public void EmitEnemyKilled(Enemy e)   => EmitSignal(SignalName.EnemyKilled, e);
     public void EmitPlayerDied(Character p) => EmitSignal(SignalName.PlayerDied, p);

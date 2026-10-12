@@ -12,8 +12,8 @@ public partial class GameManager : Node
     // ── Estado persistente entre escenas ──────────────────────────
     public int  Lives        { get; private set; } = 5;
     public int  CurrentLives => Lives;
-    public bool HasKey       { get; private set; } = false;
-    public bool HasCure      { get; private set; } = false;
+    public bool HasKey       { get; set; } = false;
+    public bool HasCure      { get; set; } = false;
     public int  CurrentLevel { get; private set; } = 1;
 
     public GameState State { get; private set; } = GameState.MainMenu;
@@ -29,7 +29,7 @@ public partial class GameManager : Node
 
     public void StartGame()
     {
-        Lives = 5; 
+        Lives = 5;
         HasKey = false;
         HasCure = false;
         CurrentLevel = 1;
@@ -82,7 +82,7 @@ public partial class GameManager : Node
     private static string GetLevelScenePath(int level) => level switch
     {
         1 => "res://levels/Level1Almacen.tscn",
-        2 => "res://levels/Level2BovedaDeLaCura.tscn",    
+        2 => "res://levels/Level2BovedaDeLaCura.tscn",
         3 => "res://levels/Level3Cocina.tscn",
         _ => "res://levels/Level1Almacen.tscn"
     };
