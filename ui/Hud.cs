@@ -1,5 +1,6 @@
 // res://ui/Hud.cs
 using Godot;
+using System;
 
 /// <summary>
 /// HUD principal del juego.
@@ -16,20 +17,20 @@ public partial class Hud : CanvasLayer
     public override void _Ready()
     {
         // Fallback dinámico si no están asignados por Export o Path en .tscn
-        _livesLabel ??= GetNodeOrNull<Label>("MarginContainer/VBoxContainer/LivesLabel") 
-                          ?? GetNodeOrNull<Label>("VBoxContainer/LivesLabel") 
+        _livesLabel ??= GetNodeOrNull<Label>("MarginContainer/VBoxContainer/LivesLabel")
+                          ?? GetNodeOrNull<Label>("VBoxContainer/LivesLabel")
                           ?? GetNodeOrNull<Label>("LivesLabel");
 
-        _healthBar  ??= GetNodeOrNull<ProgressBar>("MarginContainer/VBoxContainer/HealthBar") 
-                          ?? GetNodeOrNull<ProgressBar>("VBoxContainer/HealthBar") 
+        _healthBar  ??= GetNodeOrNull<ProgressBar>("MarginContainer/VBoxContainer/HealthBar")
+                          ?? GetNodeOrNull<ProgressBar>("VBoxContainer/HealthBar")
                           ?? GetNodeOrNull<ProgressBar>("HealthBar");
 
-        _keyIcon    ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/KeyIcon") 
-                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/KeyIcon") 
+        _keyIcon    ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/KeyIcon")
+                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/KeyIcon")
                           ?? GetNodeOrNull<TextureRect>("KeyIcon");
 
-        _cureIcon   ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/CureIcon") 
-                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/CureIcon") 
+        _cureIcon   ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/CureIcon")
+                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/CureIcon")
                           ?? GetNodeOrNull<TextureRect>("CureIcon");
 
         EventBus.Instance.HealthChanged     += OnHealthChanged;
@@ -39,9 +40,35 @@ public partial class Hud : CanvasLayer
         EventBus.Instance.AdrenalineStarted += OnAdrenalineStarted;
         EventBus.Instance.AdrenalineEnded   += OnAdrenalineEnded;
 
+        // Instanciar PauseMenu como child de este HUD
+        InstantiatePauseMenu();
+
         UpdateLivesDisplay();
         if (_keyIcon  is not null) _keyIcon.Visible  = GameManager.Instance.HasKey;
         if (_cureIcon is not null) _cureIcon.Visible = GameManager.Instance.HasCure;
+
+        GD.PrintRich("[color=yellow]HUD: Sistema de interfaz inicializado con menú de pausa[/color]");
+    }
+
+    /// <summary>
+    /// Instancia dinámicamente el menú de pausa como child del HUD.
+    /// </summary>
+    private void InstantiatePauseMenu()
+    {
+        try
+        {
+            var pauseMenuScene = GD.Load<PackedScene>("res://ui/PauseMenu.tscn");
+            if (pauseMenuScene is not null)
+            {
+                var pauseMenu = pauseMenuScene.Instantiate<Control>();
+                AddChild(pauseMenu);
+                GD.PrintRich("[color=cyan]HUD: Menú de pausa instanciado[/color]");
+            }
+        }
+        catch (Exception ex)
+        {
+            GD.PrintErr($"Error al instanciar PauseMenu: {ex.Message}");
+        }
     }
 
     private void OnHealthChanged(Character c, int current, int max)

@@ -1,0 +1,74 @@
+// res://ui/PauseMenu.cs
+using Godot;
+
+/// <summary>
+/// Controlador de la pantalla de pausa.
+/// Accesible con tecla Escape/P. Permite reanudar o volver al menú principal.
+/// </summary>
+public partial class PauseMenu : Control
+{
+    private Button? _buttonResume;
+    private Button? _buttonMainMenu;
+    private bool _isPauseMenuVisible = false;
+
+    public override void _Ready()
+    {
+        _buttonResume = GetNode<Button>("VBoxContainer/ButtonResume");
+        _buttonMainMenu = GetNode<Button>("VBoxContainer/ButtonMainMenu");
+
+        _buttonResume.Pressed += OnResumePressed;
+        _buttonMainMenu.Pressed += OnMainMenuPressed;
+
+        // Inicialmente oculto
+        Visible = false;
+
+        GD.PrintRich("[color=yellow]PauseMenu: Script de pausa inicializado[/color]");
+    }
+
+    public override void _UnhandledInput(InputEvent @event)
+    {
+        if (@event.IsActionPressed("ui_cancel") || @event.IsActionPressed("pause_menu"))
+        {
+            TogglePauseMenu();
+            GetTree().Root.SetInputAsHandled();
+        }
+    }
+
+    private void TogglePauseMenu()
+    {
+        _isPauseMenuVisible = !_isPauseMenuVisible;
+        Visible = _isPauseMenuVisible;
+
+        if (_isPauseMenuVisible)
+        {
+            GetTree().Paused = true;
+            GD.PrintRich("[color=yellow]PauseMenu: Juego pausado[/color]");
+        }
+        else
+        {
+            GetTree().Paused = false;
+            GD.PrintRich("[color=lime]PauseMenu: Juego reanudado[/color]");
+        }
+    }
+
+    private void OnResumePressed()
+    {
+        GetTree().Paused = false;
+        Visible = false;
+        _isPauseMenuVisible = false;
+        GD.PrintRich("[color=lime]PauseMenu: Reanudando juego[/color]");
+    }
+
+    private void OnMainMenuPressed()
+    {
+        GetTree().Paused = false;
+        GD.PrintRich("[color=orange]PauseMenu: Volviendo al menú principal[/color]");
+        GetTree().ChangeSceneToFile("res://ui/MainMenu.tscn");
+    }
+
+    public override void _ExitTree()
+    {
+        if (_buttonResume is not null)    _buttonResume.Pressed -= OnResumePressed;
+        if (_buttonMainMenu is not null)  _buttonMainMenu.Pressed -= OnMainMenuPressed;
+    }
+}

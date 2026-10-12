@@ -34,11 +34,30 @@ public partial class GameManager : Node
         HasCure = false;
         CurrentLevel = 1;
         TransitionState(GameState.Playing);
+        GD.PrintRich($"[color=lime]GameManager: Iniciando juego - Nivel {CurrentLevel}[/color]");
         GetTree().ChangeSceneToFile(GetLevelScenePath(CurrentLevel));
     }
 
-    public void PauseGame()  => TransitionState(GameState.Paused);
-    public void ResumeGame() => TransitionState(GameState.Playing);
+    public void GoToMainMenu()
+    {
+        TransitionState(GameState.MainMenu);
+        GD.PrintRich("[color=cyan]GameManager: Volviendo a Main Menu[/color]");
+        GetTree().ChangeSceneToFile("res://ui/MainMenu.tscn");
+    }
+
+    public void PauseGame()
+    {
+        TransitionState(GameState.Paused);
+        GetTree().Paused = true;
+        GD.PrintRich("[color=yellow]GameManager: Juego pausado[/color]");
+    }
+
+    public void ResumeGame()
+    {
+        TransitionState(GameState.Playing);
+        GetTree().Paused = false;
+        GD.PrintRich("[color=lime]GameManager: Juego reanudado[/color]");
+    }
 
     /// <summary>
     /// Pierde una vida. Transiciona a GameOver si llega a 0, o recarga la escena actual.
@@ -68,9 +87,16 @@ public partial class GameManager : Node
     {
         CurrentLevel = lvl + 1;
         if (CurrentLevel > 3)
+        {
             TransitionState(GameState.Victory);
+            GD.PrintRich("[color=gold]GameManager: ¡VICTORIA! Mostrando pantalla de victoria[/color]");
+            GetTree().ChangeSceneToFile("res://ui/VictoryScreen.tscn");
+        }
         else
+        {
+            GD.PrintRich($"[color=cyan]GameManager: Transición a Nivel {CurrentLevel}[/color]");
             GetTree().ChangeSceneToFile(GetLevelScenePath(CurrentLevel));
+        }
     }
 
     private void TransitionState(GameState next) => State = next;

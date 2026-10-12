@@ -1,0 +1,72 @@
+[gd_scene load_steps=2 format=3 uid="uid://dui2lqvj3c1x"]
+
+[ext_resource type="Script" path="res://ui/VictoryScreen.cs" id="1_7hmnd"]
+
+[node name="VictoryScreen" type="Control"]
+layout_mode = 3
+anchors/left = 0.0
+anchors/top = 0.0
+anchors/right = 1.0
+anchors/bottom = 1.0
+offset/left = 0.0
+offset/top = 0.0
+offset/right = 0.0
+offset/bottom = 0.0
+script = SubResource("1_7hmnd")
+
+[node name="Panel" type="Panel" parent="."]
+layout_mode = 1
+anchors/left = 0.0
+anchors/top = 0.0
+anchors/right = 1.0
+anchors/bottom = 1.0
+offset/left = 0.0
+offset/top = 0.0
+offset/right = 0.0
+offset/bottom = 0.0
+modulate/color = Color(0.1, 0.1, 0.2, 1)
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors/left = 0.5
+anchors/top = 0.5
+anchors/right = 0.5
+anchors/bottom = 0.5
+offset/left = -300.0
+offset/top = -250.0
+offset/right = 300.0
+offset/bottom = 250.0
+alignment = 1
+
+[node name="LabelTitle" type="Label" parent="VBoxContainer"]
+layout_mode = 2
+text = "¡VICTORIA!"
+horizontal_alignment = 1
+custom_minimum_size = Vector2(600, 80)
+
+[node name="Spacer" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(600, 300)
+
+[node name="LabelCredits" type="Label" parent="VBoxContainer/ScrollContainer"]
+layout_mode = 2
+text = "Créditos..."
+autowrap_mode = 2
+
+[node name="Spacer2" type="Control" parent="VBoxContainer"]
+layout_mode = 2
+custom_minimum_size = Vector2(0, 20)
+
+[node name="ButtonMainMenu" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Menú Principal"
+custom_minimum_size = Vector2(300, 50)
+
+[node name="ButtonExit" type="Button" parent="VBoxContainer"]
+layout_mode = 2
+text = "Salir"
+custom_minimum_size = Vector2(300, 50)
