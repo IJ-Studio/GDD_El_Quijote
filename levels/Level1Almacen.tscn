@@ -19,6 +19,7 @@
 [ext_resource type="PackedScene" path="res://projectiles/VaultKey.tscn" id="17_key"]
 [ext_resource type="PackedScene" path="res://projectiles/VaultDoor.tscn" id="18_door"]
 [ext_resource type="PackedScene" path="res://projectiles/HiloDeQueso.tscn" id="19_projectile"]
+[ext_resource type="PackedScene" path="res://levels/AdrenalineController.tscn" id="20_adrenaline"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
 size = Vector2(1200, 50)
@@ -148,6 +149,12 @@ color = Color(0.2, 0.3, 0.2, 1)
 script = ExtResource("14_pool")
 PoolSizePerType = 20
 HiloDeQuesoScene = ExtResource("19_projectile")
+
+# ─────────────────────────────────────────────────────────────────
+# SISTEMA DE OLEADA DE ADRENALINA
+# ─────────────────────────────────────────────────────────────────
+
+[node name="AdrenalineController" parent="." instance=ExtResource("20_adrenaline")]
 
 # ─────────────────────────────────────────────────────────────────
 # JUGADORES
