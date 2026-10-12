@@ -1,0 +1,72 @@
+[gd_scene load_steps=15 format=3 uid="uid://d0c8oy5qpq3s"]
+
+[ext_resource type="Script" path="res://entities/enemies/TacoMayor.cs" id="1_script"]
+[ext_resource type="Script" path="res://states/StateMachine.cs" id="2_statemachine"]
+[ext_resource type="Script" path="res://states/enemy_states/GuardState.cs" id="3_guard"]
+[ext_resource type="Script" path="res://states/enemy_states/EnemyDeadState.cs" id="4_dead"]
+[ext_resource type="Script" path="res://combat/Hitbox.cs" id="5_hitbox"]
+[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="6_hurtbox"]
+
+[sub_resource type="RectangleShape2D" id="1_rect"]
+size = Vector2(48, 64)
+
+[sub_resource type="RectangleShape2D" id="2_rect"]
+size = Vector2(60, 70)
+
+[sub_resource type="CircleShape2D" id="3_circle"]
+radius = 100.0
+
+[node name="TacoMayor" type="CharacterBody2D"]
+script = ExtResource("1_script")
+MaxHealth = 150
+CurrentHealth = 150
+Speed = 90
+MaxHealthPhase1 = 150
+MaxHealthPhase2 = 150
+MaxHealthPhase3 = 150
+AttackCooldownPhase1 = 3.0
+AttackCooldownPhase2 = 1.8
+AttackCooldownPhase3 = 0.7
+ChargeSpeedPhase3 = 280.0
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+offset = Vector2(0, -32)
+
+[node name="ColorRect" type="ColorRect" parent="."]
+offset_left = -24.0
+offset_top = -32.0
+offset_right = 24.0
+offset_bottom = 32.0
+color = Color(0.8, 0.2, 0.1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0, -32)
+shape = SubResource("1_rect")
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("2_statemachine")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 2
+collision_mask = 4
+
+[node name="CollisionShape2D" parent="Hitbox"]
+position = Vector2(0, -32)
+shape = SubResource("2_rect")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0, -32)
+shape = SubResource("2_rect")
+
+[node name="GuardZone" type="Area2D" parent="."]
+position = Vector2(0, -32)
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape2D" parent="GuardZone"]
+shape = SubResource("3_circle")

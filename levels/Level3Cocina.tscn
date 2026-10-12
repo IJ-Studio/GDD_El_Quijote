@@ -1,7 +1,169 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=24 format=3 uid="uid://xb5mh7lqpm9s"]
 
 [ext_resource type="PackedScene" path="res://ui/Hud.tscn" id="1_hud"]
+[ext_resource type="Script" path="res://entities/players/DonQuijote.cs" id="2_player"]
+[ext_resource type="Script" path="res://states/StateMachine.cs" id="3_statemachine"]
+[ext_resource type="Script" path="res://states/player_states/IdleState.cs" id="4_idle"]
+[ext_resource type="Script" path="res://states/player_states/RunState.cs" id="5_run"]
+[ext_resource type="Script" path="res://states/player_states/JumpState.cs" id="6_jump"]
+[ext_resource type="Script" path="res://states/player_states/FallState.cs" id="7_fall"]
+[ext_resource type="Script" path="res://states/player_states/AttackState.cs" id="8_attack"]
+[ext_resource type="Script" path="res://states/player_states/DeadState.cs" id="9_dead"]
+[ext_resource type="Script" path="res://combat/Hitbox.cs" id="10_hitbox"]
+[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="11_hurtbox"]
+[ext_resource type="PackedScene" path="res://entities/players/SanchoPanza.tscn" id="12_sanchopanza"]
+[ext_resource type="Script" path="res://combat/ProjectilePool.cs" id="13_pool"]
+[ext_resource type="PackedScene" path="res://entities/enemies/TacoMayor.tscn" id="14_boss"]
+[ext_resource type="PackedScene" path="res://projectiles/VictoryDoor.tscn" id="15_door"]
+[ext_resource type="PackedScene" path="res://projectiles/Albondiga.tscn" id="16_albondiga"]
+[ext_resource type="PackedScene" path="res://projectiles/SalsaPicante.tscn" id="17_salsa"]
+[ext_resource type="PackedScene" path="res://projectiles/HiloDeQueso.tscn" id="18_projectile"]
+[ext_resource type="Script" path="res://levels/AdrenalineController.cs" id="19_adrenaline"]
+
+[sub_resource type="RectangleShape2D" id="1_rect"]
+size = Vector2(1200, 50)
+
+[sub_resource type="RectangleShape2D" id="2_rect"]
+size = Vector2(300, 40)
+
+[sub_resource type="RectangleShape2D" id="3_rect"]
+size = Vector2(150, 40)
+
+[sub_resource type="RectangleShape2D" id="4_rect"]
+size = Vector2(400, 300)
 
 [node name="Level3Cocina" type="Node2D"]
 
-[node name="Hud" parent="." instance=ExtResource("1_hud")]
+[node name="HUD" instance=ExtResource("1_hud")]
+
+[node name="Platforms" type="Node"]
+
+[node name="Ground" type="StaticBody2D" parent="Platforms"]
+position = Vector2(600, 500)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/Ground"]
+shape = SubResource("1_rect")
+
+[node name="ColorRect" type="ColorRect" parent="Platforms/Ground"]
+offset_left = -600.0
+offset_top = -25.0
+offset_right = 600.0
+offset_bottom = 25.0
+color = Color(0.3, 0.3, 0.3, 1)
+
+[node name="PlatformCenter" type="StaticBody2D" parent="Platforms"]
+position = Vector2(600, 350)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/PlatformCenter"]
+shape = SubResource("2_rect")
+
+[node name="ColorRect" type="ColorRect" parent="Platforms/PlatformCenter"]
+offset_left = -150.0
+offset_top = -20.0
+offset_right = 150.0
+offset_bottom = 20.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="PlatformLeft" type="StaticBody2D" parent="Platforms"]
+position = Vector2(250, 280)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/PlatformLeft"]
+shape = SubResource("3_rect")
+
+[node name="ColorRect" type="ColorRect" parent="Platforms/PlatformLeft"]
+offset_left = -75.0
+offset_top = -20.0
+offset_right = 75.0
+offset_bottom = 20.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="PlatformRight" type="StaticBody2D" parent="Platforms"]
+position = Vector2(950, 280)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Platforms/PlatformRight"]
+shape = SubResource("3_rect")
+
+[node name="ColorRect" type="ColorRect" parent="Platforms/PlatformRight"]
+offset_left = -75.0
+offset_top = -20.0
+offset_right = 75.0
+offset_bottom = 20.0
+color = Color(0.5, 0.5, 0.5, 1)
+
+[node name="ProjectilePool" type="Node"]
+script = ExtResource("13_pool")
+PoolSizePerType = 20
+AlbondigaScene = ExtResource("16_albondiga")
+SalsaPicanteScene = ExtResource("17_salsa")
+HiloDeQuesoScene = ExtResource("18_projectile")
+
+[node name="Players" type="Node"]
+
+[node name="DonQuijote" type="CharacterBody2D" parent="Players"]
+position = Vector2(100, 350)
+script = ExtResource("2_player")
+MaxHealth = 100
+CurrentHealth = 100
+Speed = 150
+JumpPower = 300
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="Players/DonQuijote"]
+texture_filter = 1
+offset = Vector2(0, -32)
+
+[node name="ColorRect" type="ColorRect" parent="Players/DonQuijote"]
+offset_left = -24.0
+offset_top = -32.0
+offset_right = 24.0
+offset_bottom = 32.0
+color = Color(0.25, 0.8, 1, 1)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Players/DonQuijote"]
+position = Vector2(0, -32)
+shape = SubResource("2_rect")
+
+[node name="StateMachine" type="Node" parent="Players/DonQuijote"]
+script = ExtResource("3_statemachine")
+
+[node name="Hitbox" type="Area2D" parent="Players/DonQuijote"]
+collision_layer = 2
+collision_mask = 4
+
+[node name="CollisionShape2D" parent="Players/DonQuijote/Hitbox"]
+position = Vector2(0, -32)
+shape = SubResource("2_rect")
+
+[node name="Hurtbox" type="Area2D" parent="Players/DonQuijote"]
+collision_layer = 4
+collision_mask = 2
+
+[node name="CollisionShape2D" parent="Players/DonQuijote/Hurtbox"]
+position = Vector2(0, -32)
+shape = SubResource("2_rect")
+
+[node name="SanchoPanza" parent="Players" instance=ExtResource("12_sanchopanza")]
+position = Vector2(180, 350)
+
+[node name="Enemies" type="Node"]
+
+[node name="TacoMayor" parent="Enemies" instance=ExtResource("14_boss")]
+position = Vector2(600, 320)
+
+[node name="AdrenalineController" type="Node" parent="."]
+script = ExtResource("19_adrenaline")
+MinDuration = 0.0
+MaxDuration = 0.0
+
+[node name="TriggerZone" type="Area2D" parent="AdrenalineController"]
+position = Vector2(600, 350)
+collision_layer = 0
+collision_mask = 0
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AdrenalineController/TriggerZone"]
+shape = SubResource("4_rect")
+
+[node name="VictoryDoor" parent="." instance=ExtResource("15_door")]
+position = Vector2(1150, 400)
+
+[connection signal="area_entered" from="AdrenalineController/TriggerZone" to="AdrenalineController" method="OnAreaEntered"]
+[connection signal="area_exited" from="AdrenalineController/TriggerZone" to="AdrenalineController" method="OnAreaExited"]

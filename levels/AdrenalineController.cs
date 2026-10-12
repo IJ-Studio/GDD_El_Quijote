@@ -34,6 +34,12 @@ public partial class AdrenalineController : Node
 
         // Limpiar referencias a enemigos eliminados
         EventBus.Instance.EnemyKilled += OnEnemyKilled;
+
+        // Modo permanente: Si MinDuration == 0 && MaxDuration == 0, oleada siempre activa (Level 3)
+        if (MinDuration == 0f && MaxDuration == 0f)
+        {
+            StartPermanentAdrenaline();
+        }
     }
 
     public override void _Process(double delta)
@@ -142,6 +148,19 @@ public partial class AdrenalineController : Node
             _enemiesInZone.Remove(dead);
     }
 
+    /// <summary>
+    /// Inicia la Oleada de Adrenalina de forma permanente sin temporizador.
+    /// Utilizado en Level 3 (Jefe Final) donde MinDuration == 0 && MaxDuration == 0.
+    /// </summary>
+    private void StartPermanentAdrenaline()
+    {
+        _currentState = AdrenalineState.Adrenaline;
+        _stateTimer = float.MaxValue; // Nunca expira por tiempo
+
+        GD.Print("[ADRENALINE] Oleada permanente iniciada (Nivel 3 - Jefe Final)");
+        EventBus.Instance.EmitAdrenalineStarted();
+    }
+
     public override void _ExitTree()
     {
         if (TriggerZone != null)
@@ -151,6 +170,7 @@ public partial class AdrenalineController : Node
         }
         EventBus.Instance.EnemyKilled -= OnEnemyKilled;
     }
+
 
     private enum AdrenalineState { Normal, Adrenaline }
 }
