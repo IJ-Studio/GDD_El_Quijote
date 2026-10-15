@@ -9,7 +9,7 @@ using Godot;
 public partial class VaultKey : Area2D
 {
     /// <summary>Rotación base de la llave (grados por segundo).</summary>
-    [Export] public float RotationSpeed { get; set; } = 180f;
+    [Export] public float RotationSpeed { get; set; } = 0f;
 
     /// <summary>Amplitud del movimiento vertical oscilante.</summary>
     [Export] public float BobAmplitude { get; set; } = 10f;
@@ -53,10 +53,11 @@ public partial class VaultKey : Area2D
 
         // Emitir señal global — GameManager escucha y marca HasKey = true
         EventBus.Instance.EmitKeyCollected();
+        AudioManager.Instance?.PlaySfx("recoger", -6f);
 
         // Desaparecer (sin eliminar, solo ocultar)
         Visible = false;
-        Monitorable = false;
-        CollisionMask = 0;
+        SetDeferred(Area2D.PropertyName.Monitorable, false);
+        SetDeferred(Area2D.PropertyName.Monitoring, false);
     }
 }

@@ -3,13 +3,12 @@ using Godot;
 
 /// <summary>
 /// Estado de retroceso (Hurt) al recibir daño.
-/// Reproduce la animación de daño y regresa a Idle al finalizar.
+/// Empuja al personaje hacia atrás y regresa a Idle al terminar la animación.
 /// </summary>
 public partial class HurtState : Node, IState
 {
-    private const string ANIM_HURT = "hurt";
     private Character _owner = null!;
-
+    private float _timer = 0f;
     public HurtState() { }
     public HurtState(Character owner) => _owner = owner;
 
@@ -25,27 +24,33 @@ public partial class HurtState : Node, IState
 
     public void Enter()
     {
-        if (_owner.Sprite.SpriteFrames?.HasAnimation(ANIM_HURT) == true)
+        if (_owner.Sprite.SpriteFrames?.HasAnimation("hurt") == true)
         {
-            _owner.Sprite.Play(ANIM_HURT);
+            _owner.Sprite.Play("hurt");
         }
         else
         {
             _owner.Sprite.Play("idle");
         }
         _owner.Sprite.AnimationFinished += OnAnimationFinished;
-        _owner.Velocity = new Vector2(-Mathf.Sign(_owner.Scale.X) * 50f, _owner.Velocity.Y);
+        _owner.Velocity = new Vector2(-_owner.Facing * 170f, -160f);
+        _timer = 0.45f;
     }
 
-    public void Update(double delta) { }
+    public void Update(double delta)
+    {
+        // Respaldo por si la animación es en bucle: sale por tiempo
+        _timer -= (float)delta;
+        if (_timer <= 0f) _owner.StateMachine.TransitionTo(_owner.IsOnFloor() ? "Idle" : "Fall");
+    }
 
     public void PhysicsUpdate(double delta)
     {
         Vector2 velocity = _owner.Velocity;
-        velocity.X = Mathf.MoveToward(velocity.X, 0, 200f * (float)delta);
+        velocity.X = Mathf.MoveToward(velocity.X, 0, 400f * (float)delta);
         if (!_owner.IsOnFloor())
         {
-            velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+            velocity.Y += Character.Gravity * (float)delta;
         }
         _owner.Velocity = velocity;
         _owner.MoveAndSlide();
@@ -58,7 +63,7 @@ public partial class HurtState : Node, IState
 
     private void OnAnimationFinished()
     {
-        if (_owner.Sprite.Animation == ANIM_HURT || _owner.Sprite.Animation == "idle")
+        if (_owner.Sprite.Animation == "hurt" && _owner.IsOnFloor())
         {
             _owner.StateMachine.TransitionTo("Idle");
         }

@@ -2,11 +2,10 @@
 using Godot;
 
 /// <summary>
-/// Estado de caída (Fall) del jugador.
+/// Estado de caída (Fall) del jugador. Al tocar el piso vuelve a Idle.
 /// </summary>
 public partial class FallState : Node, IState
 {
-    private const string ANIM_FALL = "fall";
     private Character _owner = null!;
 
     public FallState() { }
@@ -17,41 +16,41 @@ public partial class FallState : Node, IState
         if (_owner == null)
         {
             Node p = GetParent();
-            while (p != null && p is not Character)
-            {
-                p = p.GetParent();
-            }
+            while (p != null && p is not Character) p = p.GetParent();
             if (p is Character c) _owner = c;
         }
     }
 
     public void Enter()
     {
-        if (_owner?.Sprite.SpriteFrames?.HasAnimation(ANIM_FALL) == true)
-        {
-            _owner.Sprite.Play(ANIM_FALL);
-        }
+        if (_owner.Sprite.SpriteFrames?.HasAnimation("fall") == true)
+            _owner.Sprite.Play("fall");
         else
-        {
-            _owner?.Sprite.Play("jump");
-        }
+            _owner.Sprite.Play("jump");
     }
 
     public void Update(double delta)
     {
-        if (_owner?.IsOnFloor() == true)
+        if (_owner.IsActionJustPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
         {
+            _owner.StateMachine.TransitionTo("Attack");
+            return;
+        }
+
+        if (_owner.IsOnFloor())
+        {
+            AudioManager.Instance?.PlaySfx("aterrizar", -12f);
             _owner.StateMachine.TransitionTo("Idle");
         }
     }
 
     public void PhysicsUpdate(double delta)
     {
-        if (_owner == null) return;
         float direction = _owner.GetAxis("left", "right");
+        if (!Mathf.IsZeroApprox(direction)) _owner.SetFacing(direction < 0 ? -1 : 1);
         Vector2 velocity = _owner.Velocity;
         velocity.X = direction * _owner.Speed;
-        velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+        velocity.Y += Character.Gravity * (float)delta;
         _owner.Velocity = velocity;
         _owner.MoveAndSlide();
     }

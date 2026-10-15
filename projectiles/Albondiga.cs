@@ -18,7 +18,7 @@ public partial class Albondiga : BaseProjectile
     public override void Launch(Vector2 position, Vector2 direction)
     {
         base.Launch(position, direction);
-        _velocity = direction * Speed;
+        _velocity = Direction * Speed;
         _bounceCount = 0;
     }
 
@@ -69,12 +69,15 @@ public partial class Albondiga : BaseProjectile
 
     private void ExplodeInArea()
     {
+        EventBus.Instance.EmitProjectileBurst(GlobalPosition, (int)Type);
         // Buscar todas las Hurtbox en el área de explosión
         var space = GetWorld2D().DirectSpaceState;
         var query = new PhysicsShapeQueryParameters2D();
         query.Shape = new CircleShape2D { Radius = ExplosionRadius };
         query.Transform = GlobalTransform;
-        query.CollisionMask = 4; // Collision layer de Hurtbox
+        query.CollisionMask = 8; // Capa "hurtbox_jugador"
+        query.CollideWithAreas = true;
+        query.CollideWithBodies = false;
 
         var results = space.IntersectShape(query);
         foreach (var result in results)

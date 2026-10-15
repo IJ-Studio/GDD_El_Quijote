@@ -66,7 +66,7 @@ public partial class BlockState : Node, IState
         Vector2 velocity = _owner.Velocity;
         if (!_owner.IsOnFloor())
         {
-            velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+            velocity.Y += (float)(Character.Gravity * delta);
         }
         _owner.Velocity = velocity;
         _owner.MoveAndSlide();

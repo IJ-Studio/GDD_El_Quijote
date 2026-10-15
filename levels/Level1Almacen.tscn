@@ -1,263 +1,226 @@
-[gd_scene format=3 uid="uid://baotfqj1ap2hp"]
+[gd_scene load_steps=30 format=3]
 
-[ext_resource type="PackedScene" path="res://ui/Hud.tscn" id="1_hud"]
-[ext_resource type="Script" uid="uid://cprpwr3c5hp6t" path="res://entities/players/DonQuijote.cs" id="2_player"]
-[ext_resource type="Script" uid="uid://bpjx23m6y18xw" path="res://states/StateMachine.cs" id="3_statemachine"]
-[ext_resource type="Script" uid="uid://bxr7geqedep8e" path="res://states/player_states/IdleState.cs" id="4_idle"]
-[ext_resource type="Script" uid="uid://cxppmtswq1jb0" path="res://states/player_states/RunState.cs" id="5_run"]
-[ext_resource type="Script" uid="uid://clrjuwv5mwioj" path="res://states/player_states/JumpState.cs" id="6_jump"]
-[ext_resource type="Script" uid="uid://c7riva26xu6o4" path="res://states/player_states/FallState.cs" id="7_fall"]
-[ext_resource type="Script" uid="uid://c4fnp0arcgdgv" path="res://states/player_states/AttackState.cs" id="8_attack"]
-[ext_resource type="Script" uid="uid://mewao7gca5vk" path="res://states/player_states/DeadState.cs" id="9_dead"]
-[ext_resource type="Script" uid="uid://dfhqtxqykueik" path="res://combat/Hitbox.cs" id="10_hitbox"]
-[ext_resource type="Script" uid="uid://cxr04m0kgylvf" path="res://combat/Hurtbox.cs" id="11_hurtbox"]
-[ext_resource type="Script" uid="uid://citlr0vs1um1j" path="res://levels/TestHazard.cs" id="12_hazard"]
-[ext_resource type="PackedScene" path="res://entities/players/SanchoPanza.tscn" id="13_sanchopanza"]
-[ext_resource type="Script" path="res://combat/ProjectilePool.cs" id="14_pool"]
-[ext_resource type="PackedScene" path="res://entities/enemies/SliceOPizza.tscn" id="15_sliceop"]
-[ext_resource type="PackedScene" path="res://entities/enemies/BurgerBashing.tscn" id="16_burger"]
-[ext_resource type="PackedScene" path="res://projectiles/VaultKey.tscn" id="17_key"]
-[ext_resource type="PackedScene" path="res://projectiles/VaultDoor.tscn" id="18_door"]
-[ext_resource type="PackedScene" path="res://projectiles/HiloDeQueso.tscn" id="19_projectile"]
-[ext_resource type="PackedScene" path="res://levels/AdrenalineController.tscn" id="20_adrenaline"]
+[ext_resource type="Script" path="res://levels/LevelController.cs" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/almacen.png" id="2_r"]
+[ext_resource type="Script" path="res://combat/ProjectilePool.cs" id="3_r"]
+[ext_resource type="PackedScene" path="res://projectiles/HiloDeQueso.tscn" id="4_r"]
+[ext_resource type="Script" path="res://levels/AdrenalineController.cs" id="5_r"]
+[ext_resource type="PackedScene" path="res://projectiles/FoodPickup.tscn" id="6_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/cofre_0.png" id="7_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/cofre_1.png" id="8_r"]
+[ext_resource type="PackedScene" path="res://projectiles/VaultKey.tscn" id="9_r"]
+[ext_resource type="PackedScene" path="res://projectiles/VaultDoor.tscn" id="10_r"]
+[ext_resource type="PackedScene" path="res://entities/enemies/SliceOPizza.tscn" id="11_r"]
+[ext_resource type="PackedScene" path="res://entities/enemies/BurgerBashing.tscn" id="12_r"]
+[ext_resource type="PackedScene" path="res://entities/players/DonQuijote.tscn" id="13_r"]
+[ext_resource type="PackedScene" path="res://entities/players/SanchoPanza.tscn" id="14_r"]
+[ext_resource type="Script" path="res://levels/LevelCamera.cs" id="15_r"]
+[ext_resource type="PackedScene" path="res://ui/Hud.tscn" id="16_r"]
+[ext_resource type="PackedScene" path="res://ui/DialogueBox.tscn" id="17_r"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_floor"]
-size = Vector2(1200, 50)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(1511.89, 80.0)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_platform_mid"]
-size = Vector2(300, 40)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(40.0, 2160.0)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_shelf"]
-size = Vector2(150, 30)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(40.0, 2160.0)
 
-[sub_resource type="SpriteFrames" id="SpriteFrames_tft2s"]
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(262.633, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5"]
+size = Vector2(92.242, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6"]
+size = Vector2(256.228, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7"]
+size = Vector2(76.8683, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8"]
+size = Vector2(108.897, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_9"]
+size = Vector2(147.331, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_10"]
+size = Vector2(98.6477, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_11"]
+size = Vector2(896.797, 260.0)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_12"]
 animations = [{
-"frames": [],
-"loop": 1,
-"name": &"idle",
-"speed": 5.0
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}],
+"loop": false,
+"name": &"closed",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_r")
+}],
+"loop": false,
+"name": &"open",
+"speed": 1.0
 }]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(32, 64)
+[node name="Level1Almacen" type="Node2D"]
+script = ExtResource("1_r")
+LevelNumber = 1
+IntroDialogue = "intro"
+CureDialogue = ""
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
-size = Vector2(40, 40)
+[node name="Fondo" type="Sprite2D" parent="."]
+z_index = -10
+texture_filter = 1
+texture = ExtResource("2_r")
+centered = false
+scale = Vector2(1.28114, 1.28114)
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
-size = Vector2(36, 68)
+[node name="Mundo" type="Node2D" parent="."]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hazard"]
-size = Vector2(32, 32)
+[node name="Piso" type="StaticBody2D" parent="Mundo"]
+position = Vector2(655.943, 606.263)
 
-[node name="Level1Almacen" type="Node2D" unique_id=288193213]
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Piso"]
+shape = SubResource("RectangleShape2D_1")
 
-[node name="Hud" parent="." unique_id=624475882 instance=ExtResource("1_hud")]
+[node name="ParedIzq" type="StaticBody2D" parent="Mundo"]
+position = Vector2(-20.0, 360.0)
 
-# ─────────────────────────────────────────────────────────────────
-# ESCENARIO: Piso + Plataformas + Estantes
-# ─────────────────────────────────────────────────────────────────
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/ParedIzq"]
+shape = SubResource("RectangleShape2D_2")
 
-[node name="Floor" type="StaticBody2D" parent="." unique_id=1549022503]
-position = Vector2(600, 500)
+[node name="ParedDer" type="StaticBody2D" parent="Mundo"]
+position = Vector2(1331.89, 360.0)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="Floor" unique_id=1706421034]
-shape = SubResource("RectangleShape2D_floor")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/ParedDer"]
+shape = SubResource("RectangleShape2D_3")
 
-[node name="ColorRect" type="ColorRect" parent="Floor" unique_id=272657535]
-offset_left = -600.0
-offset_top = -25.0
-offset_right = 600.0
-offset_bottom = 25.0
-color = Color(0.243137, 0.180392, 0.129412, 1)
+[node name="Plataforma1" type="StaticBody2D" parent="Mundo"]
+position = Vector2(131.317, 489.395)
 
-# Plataforma media (centro del escenario)
-[node name="PlatformMid" type="StaticBody2D" parent="."]
-position = Vector2(600, 350)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma1"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_4")
+one_way_collision = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformMid"]
-shape = SubResource("RectangleShape2D_platform_mid")
+[node name="Plataforma2" type="StaticBody2D" parent="Mundo"]
+position = Vector2(46.121, 411.246)
 
-[node name="ColorRect" type="ColorRect" parent="PlatformMid"]
-offset_left = -150.0
-offset_top = -20.0
-offset_right = 150.0
-offset_bottom = 20.0
-color = Color(0.2, 0.3, 0.2, 1)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma2"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_5")
+one_way_collision = true
 
-# Estante izquierdo
-[node name="ShelfLeft" type="StaticBody2D" parent="."]
-position = Vector2(250, 380)
+[node name="Plataforma3" type="StaticBody2D" parent="Mundo"]
+position = Vector2(768.683, 486.833)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ShelfLeft"]
-shape = SubResource("RectangleShape2D_shelf")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma3"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_6")
+one_way_collision = true
 
-[node name="ColorRect" type="ColorRect" parent="ShelfLeft"]
-offset_left = -75.0
-offset_top = -15.0
-offset_right = 75.0
-offset_bottom = 15.0
-color = Color(0.3, 0.25, 0.15, 1)
+[node name="Plataforma4" type="StaticBody2D" parent="Mundo"]
+position = Vector2(736.655, 416.37)
 
-# Estante derecho
-[node name="ShelfRight" type="StaticBody2D" parent="."]
-position = Vector2(950, 380)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma4"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_7")
+one_way_collision = true
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="ShelfRight"]
-shape = SubResource("RectangleShape2D_shelf")
+[node name="Plataforma5" type="StaticBody2D" parent="Mundo"]
+position = Vector2(829.537, 390.747)
 
-[node name="ColorRect" type="ColorRect" parent="ShelfRight"]
-offset_left = -75.0
-offset_top = -15.0
-offset_right = 75.0
-offset_bottom = 15.0
-color = Color(0.3, 0.25, 0.15, 1)
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma5"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_8")
+one_way_collision = true
 
-# Plataforma alta (izquierda)
-[node name="PlatformHighLeft" type="StaticBody2D" parent="."]
-position = Vector2(150, 250)
+[node name="Plataforma6" type="StaticBody2D" parent="Mundo"]
+position = Vector2(1207.47, 489.395)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformHighLeft"]
-shape = SubResource("RectangleShape2D_platform_mid")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma6"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_9")
+one_way_collision = true
 
-[node name="ColorRect" type="ColorRect" parent="PlatformHighLeft"]
-offset_left = -150.0
-offset_top = -20.0
-offset_right = 150.0
-offset_bottom = 20.0
-color = Color(0.2, 0.3, 0.2, 1)
+[node name="Plataforma7" type="StaticBody2D" parent="Mundo"]
+position = Vector2(1225.41, 413.808)
 
-# Plataforma alta (derecha)
-[node name="PlatformHighRight" type="StaticBody2D" parent="."]
-position = Vector2(1050, 250)
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="PlatformHighRight"]
-shape = SubResource("RectangleShape2D_platform_mid")
-
-[node name="ColorRect" type="ColorRect" parent="PlatformHighRight"]
-offset_left = -150.0
-offset_top = -20.0
-offset_right = 150.0
-offset_bottom = 20.0
-color = Color(0.2, 0.3, 0.2, 1)
-
-# ─────────────────────────────────────────────────────────────────
-# SISTEMA DE OBJETOS: ProjectilePool
-# ─────────────────────────────────────────────────────────────────
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma7"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_10")
+one_way_collision = true
 
 [node name="ProjectilePool" type="Node" parent="."]
-script = ExtResource("14_pool")
-PoolSizePerType = 20
-HiloDeQuesoScene = ExtResource("19_projectile")
+script = ExtResource("3_r")
+PoolSizePerType = 12
+HiloDeQuesoScene = ExtResource("4_r")
 
-# ─────────────────────────────────────────────────────────────────
-# SISTEMA DE OLEADA DE ADRENALINA
-# ─────────────────────────────────────────────────────────────────
+[node name="AdrenalineController" type="Node2D" parent="." node_paths=PackedStringArray("TriggerZone")]
+position = Vector2(422.776, 566.263)
+script = ExtResource("5_r")
+MinDuration = 15.0
+MaxDuration = 25.0
+TriggerZone = NodePath("TriggerZone")
+RewardScene = ExtResource("6_r")
 
-[node name="AdrenalineController" parent="." instance=ExtResource("20_adrenaline")]
+[node name="TriggerZone" type="Area2D" parent="AdrenalineController"]
+collision_layer = 0
+collision_mask = 6
+monitorable = false
 
-# ─────────────────────────────────────────────────────────────────
-# JUGADORES
-# ─────────────────────────────────────────────────────────────────
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AdrenalineController/TriggerZone"]
+position = Vector2(384.342, -120.0)
+shape = SubResource("RectangleShape2D_11")
 
-[node name="DonQuijote" type="CharacterBody2D" parent="." unique_id=1053661112]
-position = Vector2(100, 350)
-script = ExtResource("2_player")
+[node name="Cofre" type="AnimatedSprite2D" parent="AdrenalineController"]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_12")
+animation = &"closed"
+offset = Vector2(0.0, -27.0)
 
-[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="DonQuijote" unique_id=1352948020]
-sprite_frames = SubResource("SpriteFrames_tft2s")
-animation = &"idle"
+[node name="VaultKey" parent="." instance=ExtResource("9_r")]
+position = Vector2(1224.77, 379.808)
 
-[node name="StateMachine" type="Node" parent="DonQuijote" unique_id=1680407067]
-script = ExtResource("3_statemachine")
+[node name="VaultDoor" parent="." instance=ExtResource("10_r")]
+position = Vector2(1241.89, 566.263)
+LevelNumber = 1
 
-[node name="Idle" type="Node" parent="DonQuijote/StateMachine" unique_id=1303591691]
-script = ExtResource("4_idle")
+[node name="Comida1" parent="." instance=ExtResource("6_r")]
+position = Vector2(46.121, 385.246)
 
-[node name="Run" type="Node" parent="DonQuijote/StateMachine" unique_id=1784181179]
-script = ExtResource("5_run")
+[node name="Pizza1" parent="." instance=ExtResource("11_r")]
+position = Vector2(550.89, 566.263)
 
-[node name="Jump" type="Node" parent="DonQuijote/StateMachine" unique_id=132842977]
-script = ExtResource("6_jump")
+[node name="Burger1" parent="." instance=ExtResource("12_r")]
+position = Vector2(999.288, 566.263)
 
-[node name="Fall" type="Node" parent="DonQuijote/StateMachine" unique_id=1871988732]
-script = ExtResource("7_fall")
+[node name="Pizza2" parent="." instance=ExtResource("11_r")]
+position = Vector2(830.178, 390.747)
+PatrolDistance = 0.0
 
-[node name="Attack" type="Node" parent="DonQuijote/StateMachine" unique_id=1389063636]
-script = ExtResource("8_attack")
+[node name="DonQuijote" parent="." instance=ExtResource("13_r")]
+position = Vector2(90.0, 566.263)
 
-[node name="Dead" type="Node" parent="DonQuijote/StateMachine" unique_id=2049442050]
-script = ExtResource("9_dead")
+[node name="SanchoPanza" parent="." instance=ExtResource("14_r")]
+position = Vector2(150.0, 566.263)
 
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DonQuijote" unique_id=1238745054]
-shape = SubResource("RectangleShape2D_player")
+[node name="Camara" type="Camera2D" parent="."]
+position = Vector2(655.943, 360.0)
+limit_left = 0
+limit_top = 0
+limit_right = 1311
+limit_bottom = 720
+script = ExtResource("15_r")
 
-[node name="ColorRect" type="ColorRect" parent="DonQuijote" unique_id=222788426]
-offset_left = -16.0
-offset_top = -32.0
-offset_right = 16.0
-offset_bottom = 32.0
-color = Color(0, 0.478431, 1, 1)
+[node name="Hud" parent="." instance=ExtResource("16_r")]
 
-[node name="Camera2D" type="Camera2D" parent="DonQuijote" unique_id=2083586194]
-zoom = Vector2(1.5, 1.5)
-process_callback = 0
-position_smoothing_enabled = true
-
-[node name="Hitbox" type="Area2D" parent="DonQuijote" unique_id=1191034925]
-script = ExtResource("10_hitbox")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DonQuijote/Hitbox" unique_id=1436009070]
-position = Vector2(24, 0)
-shape = SubResource("RectangleShape2D_hitbox")
-
-[node name="Hurtbox" type="Area2D" parent="DonQuijote" unique_id=896267815]
-script = ExtResource("11_hurtbox")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="DonQuijote/Hurtbox" unique_id=19604426]
-shape = SubResource("RectangleShape2D_hurtbox")
-
-[node name="SanchoPanza" parent="." instance=ExtResource("13_sanchopanza")]
-position = Vector2(180, 350)
-
-# ─────────────────────────────────────────────────────────────────
-# ENEMIGOS: Guardias del Almacén
-# ─────────────────────────────────────────────────────────────────
-
-# Slice-O-Pizza: Enemigo a distancia (dispara proyectiles)
-[node name="EnemySlice1" parent="." instance=ExtResource("15_sliceop")]
-position = Vector2(750, 320)
-
-# Burger-Bashing: Enemigo de embestida
-[node name="EnemyBurger1" parent="." instance=ExtResource("16_burger")]
-position = Vector2(450, 320)
-
-# ─────────────────────────────────────────────────────────────────
-# OBJETOS ESPECIALES: Llave + Puerta
-# ─────────────────────────────────────────────────────────────────
-
-# Llave de la bóveda (recolectable)
-[node name="VaultKey" parent="." instance=ExtResource("17_key")]
-position = Vector2(600, 280)
-
-# Puerta de salida (se abre con llave)
-[node name="VaultDoor" parent="." instance=ExtResource("18_door")]
-position = Vector2(1150, 400)
-
-# ─────────────────────────────────────────────────────────────────
-# PRUEBAS: Hazard temporal
-# ─────────────────────────────────────────────────────────────────
-
-[node name="TestHazard" type="Area2D" parent="." unique_id=2085174225]
-position = Vector2(400, 450)
-script = ExtResource("12_hazard")
-
-[node name="CollisionShape2D" type="CollisionShape2D" parent="TestHazard" unique_id=1082610034]
-shape = SubResource("RectangleShape2D_hazard")
-
-[node name="ColorRect" type="ColorRect" parent="TestHazard" unique_id=1462518871]
-offset_left = -16.0
-offset_top = -16.0
-offset_right = 16.0
-offset_bottom = 16.0
-color = Color(0.8, 0.2, 0.2, 1)
+[node name="DialogueBox" parent="." instance=ExtResource("17_r")]

@@ -2,82 +2,117 @@
 using Godot;
 
 /// <summary>
-/// Caja de diálogo para desplegar las líneas de historia.
-/// Muestra réplicas de El Patrón y el Fantasma del Chef Fundador antes del nivel.
-/// Presionar Enter/Espacio avanza al siguiente diálogo.
+/// Caja de diálogo con ilustración. Escucha EventBus.DialogueRequested, pausa el juego,
+/// muestra las líneas con efecto de máquina de escribir y al terminar emite DialogueFinished.
+/// Avanza con Enter, Espacio, J o clic.
 /// </summary>
-public partial class DialogueBox : Control
+public partial class DialogueBox : CanvasLayer
 {
+    [Export] public float CharactersPerSecond { get; set; } = 48f;
+
+    private TextureRect? _image;
     private Label? _labelCharacter;
     private Label? _labelDialogue;
-    private Panel? _dialoguePanel;
-    private int _currentDialogueIndex = 0;
-    private bool _dialogueComplete = false;
+    private Label? _hint;
 
-    private static readonly string[] DialogueLines =
-    {
-        "El Patrón: ¡La Cura de la Sazón ha desaparecido!",
-        "El Patrón: Don Quijote, debes recuperarla de la bóveda mágica.",
-        "El Fantasma del Chef: ¡Cuidado! La oleada de Adrenalina despertará a mis sirvientes.",
-        "El Fantasma del Chef: Vence al Taco Mayor y la Cura será tuya.",
-        "El Patrón: ¡Que la suerte te acompañe, valiente caballero!"
-    };
+    private DialogueScene? _scene;
+    private string _currentId = "";
+    private int _lineIndex = 0;
+    private float _visibleChars = 0f;
+
+    public bool IsOpen => Visible;
 
     public override void _Ready()
     {
-        _labelCharacter = GetNode<Label>("DialoguePanel/VBoxContainer/LabelCharacter");
-        _labelDialogue = GetNode<Label>("DialoguePanel/VBoxContainer/LabelDialogue");
-        _dialoguePanel = GetNode<Panel>("DialoguePanel");
+        ProcessMode = ProcessModeEnum.Always;
+        _image = GetNodeOrNull<TextureRect>("Root/Image");
+        _labelCharacter = GetNodeOrNull<Label>("Root/DialoguePanel/Margin/VBox/LabelCharacter");
+        _labelDialogue = GetNodeOrNull<Label>("Root/DialoguePanel/Margin/VBox/LabelDialogue");
+        _hint = GetNodeOrNull<Label>("Root/DialoguePanel/Hint");
+        Visible = false;
+        EventBus.Instance.DialogueRequested += Open;
+    }
 
-        _currentDialogueIndex = 0;
-        DisplayNextDialogue();
+    /// <summary>Abre el diálogo indicado (si existe en DialogueLibrary).</summary>
+    public void Open(string dialogueId)
+    {
+        if (!DialogueLibrary.TryGet(dialogueId, out var scene)) return;
 
-        GD.PrintRich("[color=yellow]DialogueBox: Caja de diálogo inicializada[/color]");
+        _scene = scene;
+        _currentId = dialogueId;
+        _lineIndex = 0;
+        if (_image is not null && ResourceLoader.Exists(scene.ImagePath))
+            _image.Texture = GD.Load<Texture2D>(scene.ImagePath);
+
+        Visible = true;
+        GetTree().Paused = true;
+        ShowLine();
+    }
+
+    private void ShowLine()
+    {
+        if (_scene is null) return;
+        var line = _scene.Lines[_lineIndex];
+        if (_labelCharacter is not null) _labelCharacter.Text = line.Speaker;
+        if (_labelDialogue is not null)
+        {
+            _labelDialogue.Text = line.Text;
+            _labelDialogue.VisibleCharacters = 0;
+        }
+        _visibleChars = 0f;
+    }
+
+    public override void _Process(double delta)
+    {
+        if (!Visible || _labelDialogue is null) return;
+        int total = _labelDialogue.Text.Length;
+        if (_labelDialogue.VisibleCharacters < total)
+        {
+            _visibleChars += CharactersPerSecond * (float)delta;
+            _labelDialogue.VisibleCharacters = Mathf.Min(total, (int)_visibleChars);
+        }
+        if (_hint is not null)
+        {
+            _hint.Visible = _labelDialogue.VisibleCharacters >= total
+                            && Mathf.Sin((float)Time.GetTicksMsec() * 0.008f) > -0.3f;
+        }
     }
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (@event.IsActionPressed("ui_accept") || @event.IsActionPressed("ui_select"))
-        {
-            if (!_dialogueComplete)
-            {
-                DisplayNextDialogue();
-            }
-            else
-            {
-                CloseDialogueBox();
-            }
-            GetTree().Root.SetInputAsHandled();
-        }
-    }
+        if (!Visible) return;
 
-    private void DisplayNextDialogue()
-    {
-        if (_currentDialogueIndex >= DialogueLines.Length)
+        bool advance = @event.IsActionPressed("ui_accept")
+                       || @event.IsActionPressed("player1_attack")
+                       || @event.IsActionPressed("player2_attack")
+                       || (@event is InputEventMouseButton { Pressed: true, ButtonIndex: MouseButton.Left });
+        if (!advance) return;
+
+        GetViewport().SetInputAsHandled();
+
+        if (_labelDialogue is not null && _labelDialogue.VisibleCharacters < _labelDialogue.Text.Length)
         {
-            _dialogueComplete = true;
-            if (_labelDialogue is not null)
-                _labelDialogue.Text = "[Presiona Enter para continuar]";
+            _labelDialogue.VisibleCharacters = _labelDialogue.Text.Length;
             return;
         }
 
-        string line = DialogueLines[_currentDialogueIndex];
-        string[] parts = line.Split(": ", 2);
-
-        if (_labelCharacter is not null && parts.Length > 0)
-            _labelCharacter.Text = parts[0];
-
-        if (_labelDialogue is not null && parts.Length > 1)
-            _labelDialogue.Text = parts[1];
-
-        _currentDialogueIndex++;
+        _lineIndex++;
+        if (_scene is not null && _lineIndex < _scene.Lines.Count)
+            ShowLine();
+        else
+            Close();
     }
 
-    private void CloseDialogueBox()
+    private void Close()
     {
-        GD.PrintRich("[color=lime]DialogueBox: Diálogo completado, cerrando[/color]");
         Visible = false;
-        GetTree().Root.SetInputAsHandled();
-        QueueFree();
+        GetTree().Paused = false;
+        EventBus.Instance.EmitDialogueFinished(_currentId);
+        GD.PrintRich($"[color=lime]DialogueBox: diálogo '{_currentId}' terminado[/color]");
+    }
+
+    public override void _ExitTree()
+    {
+        EventBus.Instance.DialogueRequested -= Open;
     }
 }

@@ -1,14 +1,143 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8c0lw35gl1vgs"]
+[gd_scene load_steps=17 format=3]
 
-[ext_resource type="Scene" path="res://entities/enemies/Enemy.tscn" id="1_parent"]
-[ext_resource type="Script" path="res://entities/enemies/TacoFuria.cs" id="2_script"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_furia/taco_furia_00.png" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_furia/taco_furia_01.png" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_furia/taco_furia_02.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_furia/taco_furia_03.png" id="4_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_furia/taco_furia_04.png" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_furia/taco_furia_05.png" id="6_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_furia/taco_furia_06.png" id="7_r"]
+[ext_resource type="Script" path="res://entities/enemies/TacoFuria.cs" id="8_r"]
+[ext_resource type="Script" path="res://states/StateMachine.cs" id="9_r"]
+[ext_resource type="Script" path="res://combat/Hitbox.cs" id="10_r"]
+[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="11_r"]
 
-[node name="TacoFuria" instance=ExtResource("1_parent")]
-script = ExtResource("2_script")
-Speed = 110.0
+[sub_resource type="SpriteFrames" id="SpriteFrames_1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_r")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_r")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_r")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}],
+"loop": false,
+"name": &"death",
+"speed": 4.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2"]
+radius = 16.0
+height = 74.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(38.0, 50.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(34.0, 78.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5"]
+size = Vector2(540.0, 280.0)
+
+[node name="TacoFuria" type="CharacterBody2D" node_paths=PackedStringArray("GuardZone")]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("8_r")
+Speed = 90.0
 MaxHealth = 45
-AttackCooldown = 2.0
-AttackDuration = 1.0
+BodyHeight = 80.0
+GuardCooldown = 2.2
+PatrolDistance = 50.0
+GuardZone = NodePath("GuardZone")
 
-[node name="ColorRect" parent="." index="2"]
-color = Color(0.7, 0.4, 0.1, 1)
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_1")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0.0, -46.5)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.0, -37.0)
+shape = SubResource("CapsuleShape2D_2")
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("9_r")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 8
+monitorable = false
+script = ExtResource("10_r")
+Damage = 8
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(24.0, -40.0)
+shape = SubResource("RectangleShape2D_3")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("11_r")
+OwnerPath = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0.0, -39.0)
+shape = SubResource("RectangleShape2D_4")
+
+[node name="GuardZone" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 2
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GuardZone"]
+position = Vector2(0.0, -110.0)
+shape = SubResource("RectangleShape2D_5")

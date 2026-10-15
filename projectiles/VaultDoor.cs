@@ -2,94 +2,85 @@
 using Godot;
 
 /// <summary>
-/// Puerta de salida del Nivel 1 que valida GameManager.HasKey.
-/// Al ser tocada por el jugador CON la llave, transiciona al Nivel 2.
-/// Muestra feedback visual si se toca sin llave.
+/// Puerta de salida de un nivel. Se abre si el jugador cumple la condición
+/// (llave en el Nivel 1, Cura de la Sazón en el Nivel 2) y avisa al GameManager
+/// mediante EventBus.LevelCompleted. Si no la cumple, parpadea en rojo.
 /// </summary>
 public partial class VaultDoor : Area2D
 {
-    /// <summary>Duración de la animación de rechazo (segundos).</summary>
     [Export] public float RejectFlashDuration { get; set; } = 0.3f;
 
+    /// <summary>Número del nivel que termina al cruzar esta puerta.</summary>
+    [Export] public int LevelNumber { get; set; } = 1;
+
+    /// <summary>Si es verdadero, además de la llave pide la Cura de la Sazón.</summary>
+    [Export] public bool RequiresCure { get; set; } = false;
+
     private Control? _flashOverlay;
+    private AnimatedSprite2D? _sprite;
     private float _flashTimer = 0f;
     private bool _isFlashing = false;
+    private bool _opened = false;
 
     public override void _Ready()
     {
-        // Buscar el overlay visual para feedback (si existe en la escena)
-        _flashOverlay = GetNode<Control>("FlashOverlay") as Control;
-
-        // Conectar señal de colisión
+        _flashOverlay = GetNodeOrNull<Control>("FlashOverlay");
+        _sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
         AreaEntered += OnAreaEntered;
     }
 
     public override void _Process(double delta)
     {
-        // Actualizar flash de rechazo
-        if (_isFlashing)
+        if (!_isFlashing) return;
+        _flashTimer -= (float)delta;
+        if (_flashTimer <= 0)
         {
-            _flashTimer -= (float)delta;
-            if (_flashTimer <= 0)
-            {
-                _isFlashing = false;
-                if (_flashOverlay != null)
-                    _flashOverlay.Visible = false;
-            }
+            _isFlashing = false;
+            if (_flashOverlay != null) _flashOverlay.Visible = false;
         }
     }
 
-    /// <summary>
-    /// Reacciona cuando el jugador toca la puerta.
-    /// Si tiene llave: transiciona al Nivel 2.
-    /// Si no tiene llave: anima rechazo.
-    /// </summary>
-    private void OnAreaEntered(Node2D area)
+    private bool CanOpen()
+    {
+        bool keyOk = GameManager.Instance.HasKey || LevelNumber > 1;
+        bool cureOk = !RequiresCure || GameManager.Instance.HasCure;
+        return keyOk && cureOk;
+    }
+
+    private void OnAreaEntered(Area2D area)
     {
         // Solo reaccionar a Hurtbox del jugador
-        if (area is not Hurtbox)
+        if (area is not Hurtbox || _opened)
             return;
 
-        if (GameManager.Instance.HasKey)
-        {
-            // ✓ Tiene llave → permitir paso al siguiente nivel
+        if (CanOpen())
             OnDoorUnlocked();
-        }
         else
-        {
-            // ✗ Sin llave → mostrar rechazo visual y sonoro
             OnDoorLocked();
-        }
     }
 
-    /// <summary>Secuencia de apertura: transición al Nivel 2.</summary>
     private void OnDoorUnlocked()
     {
-        GD.Print("[VaultDoor] ¡Llave usada! Transicionando a Nivel 2...");
+        _opened = true;
+        GD.Print($"[VaultDoor] Puerta abierta. Terminando nivel {LevelNumber}...");
+        if (_sprite?.SpriteFrames?.HasAnimation("open") == true) _sprite.Play("open");
+        AudioManager.Instance?.PlaySfx("recoger", -4f);
 
-        // Opcional: reproducir sonido de apertura (futuro)
-        // AudioPlayer.Play("door_unlock")
-
-        // Emitir evento de nivel completado
-        EventBus.Instance.EmitLevelCompleted(1);
-
-        // Transicionar a siguiente nivel (GameManager lo maneja automáticamente)
-        // Se ejecutará en OnLevelCompleted() del GameManager
+        // Pequeña pausa para ver la puerta abrirse; luego GameManager cambia de nivel
+        GetTree().CreateTimer(0.7).Timeout += () => EventBus.Instance.EmitLevelCompleted(LevelNumber);
     }
 
-    /// <summary>Feedback visual y sonoro cuando se intenta abrir sin llave.</summary>
     private void OnDoorLocked()
     {
-        GD.Print("[VaultDoor] ¡Requiere llave! Bloqueada.");
-
-        // Animar flash rojo
+        GD.Print("[VaultDoor] Bloqueada: falta la llave o la Cura.");
         _isFlashing = true;
         _flashTimer = RejectFlashDuration;
+        if (_flashOverlay != null) _flashOverlay.Visible = true;
+        AudioManager.Instance?.PlaySfx("bloqueo", -10f);
+    }
 
-        if (_flashOverlay != null)
-            _flashOverlay.Visible = true;
-
-        // Opcional: reproducir sonido de rechazo (futuro)
-        // AudioPlayer.Play("door_locked_reject")
+    public override void _ExitTree()
+    {
+        AreaEntered -= OnAreaEntered;
     }
 }

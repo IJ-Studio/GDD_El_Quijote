@@ -3,11 +3,10 @@ using Godot;
 
 /// <summary>
 /// Estado de reposo (Idle) del jugador.
-/// Transiciona a Run, Jump, Crouch, Attack o Block según el input.
+/// Transiciona a Run, Jump, Fall, Crouch, Attack o Block según el input.
 /// </summary>
 public partial class IdleState : Node, IState
 {
-    private const string ANIM_IDLE = "idle";
     private Character _owner = null!;
 
     public IdleState() { }
@@ -25,13 +24,13 @@ public partial class IdleState : Node, IState
 
     public void Enter()
     {
-        _owner.Sprite.Play(ANIM_IDLE);
+        _owner.Sprite.Play("idle");
         _owner.Velocity = new Vector2(0, _owner.Velocity.Y);
     }
 
     public void Update(double delta)
     {
-        if (_owner.IsActionPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
+        if (_owner.IsActionJustPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
         {
             _owner.StateMachine.TransitionTo("Attack");
             return;
@@ -49,7 +48,13 @@ public partial class IdleState : Node, IState
             return;
         }
 
-        if (_owner.IsActionPressed("crouch") && _owner.IsOnFloor())
+        if (!_owner.IsOnFloor())
+        {
+            _owner.StateMachine.TransitionTo("Fall");
+            return;
+        }
+
+        if (_owner.IsActionPressed("crouch"))
         {
             _owner.StateMachine.TransitionTo("Crouch");
             return;
@@ -65,9 +70,10 @@ public partial class IdleState : Node, IState
     public void PhysicsUpdate(double delta)
     {
         Vector2 velocity = _owner.Velocity;
+        velocity.X = Mathf.MoveToward(velocity.X, 0, 1200f * (float)delta);
         if (!_owner.IsOnFloor())
         {
-            velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+            velocity.Y += Character.Gravity * (float)delta;
         }
         _owner.Velocity = velocity;
         _owner.MoveAndSlide();

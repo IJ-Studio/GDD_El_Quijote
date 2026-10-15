@@ -1,38 +1,31 @@
 // res://ui/Hud.cs
 using Godot;
-using System;
 
 /// <summary>
-/// HUD principal del juego.
-/// Escucha exclusivamente las señales del EventBus para actualizar la interfaz (vidas, salud, coleccionables)
-/// manteniendo un desacoplamiento estricto de la lógica interna de los personajes.
+/// El HUD solo ESCUCHA señales del EventBus (patrón Observer).
+/// Muestra la vida de cada jugador, las vidas restantes (corazones), la llave,
+/// la Cura, el aviso de Oleada de Adrenalina y la barra del jefe.
 /// </summary>
 public partial class Hud : CanvasLayer
 {
-    [Export] private Label?       _livesLabel;
-    [Export] private TextureRect? _keyIcon;
-    [Export] private TextureRect? _cureIcon;
-    [Export] private ProgressBar? _healthBar;
+    [Export] private ProgressBar?   _healthBar;
+    [Export] private ProgressBar?   _healthBarP2;
+    [Export] private Control?       _panelP2;
+    [Export] private HBoxContainer? _hearts;
+    [Export] private Label?         _livesLabel;
+    [Export] private TextureRect?   _keyIcon;
+    [Export] private TextureRect?   _cureIcon;
+    [Export] private Control?       _adrenalineBanner;
+    [Export] private TextureRect?   _adrenalineFrame;
+    [Export] private Control?       _bossPanel;
+    [Export] private ProgressBar?   _bossBar;
+    [Export] private Texture2D?     _heartFull;
+    [Export] private Texture2D?     _heartEmpty;
+
+    private Tween? _adrenalineTween;
 
     public override void _Ready()
     {
-        // Fallback dinámico si no están asignados por Export o Path en .tscn
-        _livesLabel ??= GetNodeOrNull<Label>("MarginContainer/VBoxContainer/LivesLabel")
-                          ?? GetNodeOrNull<Label>("VBoxContainer/LivesLabel")
-                          ?? GetNodeOrNull<Label>("LivesLabel");
-
-        _healthBar  ??= GetNodeOrNull<ProgressBar>("MarginContainer/VBoxContainer/HealthBar")
-                          ?? GetNodeOrNull<ProgressBar>("VBoxContainer/HealthBar")
-                          ?? GetNodeOrNull<ProgressBar>("HealthBar");
-
-        _keyIcon    ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/KeyIcon")
-                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/KeyIcon")
-                          ?? GetNodeOrNull<TextureRect>("KeyIcon");
-
-        _cureIcon   ??= GetNodeOrNull<TextureRect>("MarginContainer/VBoxContainer/IconsContainer/CureIcon")
-                          ?? GetNodeOrNull<TextureRect>("VBoxContainer/IconsContainer/CureIcon")
-                          ?? GetNodeOrNull<TextureRect>("CureIcon");
-
         EventBus.Instance.HealthChanged     += OnHealthChanged;
         EventBus.Instance.KeyCollected      += OnKeyCollected;
         EventBus.Instance.CureCollected     += OnCureCollected;
@@ -41,69 +34,91 @@ public partial class Hud : CanvasLayer
         EventBus.Instance.AdrenalineEnded   += OnAdrenalineEnded;
 
         // Instanciar PauseMenu como child de este HUD
-        InstantiatePauseMenu();
+        var pauseMenuScene = GD.Load<PackedScene>("res://ui/PauseMenu.tscn");
+        if (pauseMenuScene is not null) AddChild(pauseMenuScene.Instantiate<Control>());
 
+        // Estado inicial
+        if (_panelP2 is not null)    _panelP2.Visible = GameManager.Instance.PlayerCount > 1;
+        if (_keyIcon is not null)    _keyIcon.Modulate = GameManager.Instance.HasKey ? Colors.White : new Color(0, 0, 0, 0.45f);
+        if (_cureIcon is not null)   _cureIcon.Modulate = GameManager.Instance.HasCure ? Colors.White : new Color(0, 0, 0, 0.45f);
+        if (_adrenalineBanner is not null) _adrenalineBanner.Visible = false;
+        if (_adrenalineFrame is not null)  _adrenalineFrame.Visible = false;
+        if (_bossPanel is not null)  _bossPanel.Visible = false;
         UpdateLivesDisplay();
-        if (_keyIcon  is not null) _keyIcon.Visible  = GameManager.Instance.HasKey;
-        if (_cureIcon is not null) _cureIcon.Visible = GameManager.Instance.HasCure;
-
-        GD.PrintRich("[color=yellow]HUD: Sistema de interfaz inicializado con menú de pausa[/color]");
-    }
-
-    /// <summary>
-    /// Instancia dinámicamente el menú de pausa como child del HUD.
-    /// </summary>
-    private void InstantiatePauseMenu()
-    {
-        try
-        {
-            var pauseMenuScene = GD.Load<PackedScene>("res://ui/PauseMenu.tscn");
-            if (pauseMenuScene is not null)
-            {
-                var pauseMenu = pauseMenuScene.Instantiate<Control>();
-                AddChild(pauseMenu);
-                GD.PrintRich("[color=cyan]HUD: Menú de pausa instanciado[/color]");
-            }
-        }
-        catch (Exception ex)
-        {
-            GD.PrintErr($"Error al instanciar PauseMenu: {ex.Message}");
-        }
     }
 
     private void OnHealthChanged(Character c, int current, int max)
     {
-        if (c is DonQuijote && _healthBar is not null)
+        float percent = max > 0 ? (float)current / max * 100f : 0f;
+        switch (c)
         {
-            _healthBar.MaxValue = max;
-            _healthBar.Value = current;
+            case DonQuijote when _healthBar is not null:
+                _healthBar.Value = percent;
+                break;
+            case SanchoPanza when _healthBarP2 is not null:
+                _healthBarP2.Value = percent;
+                break;
+            case TacoMayor when _bossBar is not null && _bossPanel is not null:
+                _bossPanel.Visible = current > 0;
+                _bossBar.Value = percent;
+                break;
         }
     }
 
-    private void OnPlayerDied(Character _)
-    {
-        UpdateLivesDisplay();
-    }
+    private void OnPlayerDied(Character _) => UpdateLivesDisplay(GameManager.Instance.Lives - 1);
 
     private void OnKeyCollected()
     {
-        if (_keyIcon is not null) _keyIcon.Visible = true;
+        if (_keyIcon is null) return;
+        _keyIcon.Modulate = Colors.White;
+        Pop(_keyIcon);
     }
 
     private void OnCureCollected()
     {
-        if (_cureIcon is not null) _cureIcon.Visible = true;
+        if (_cureIcon is null) return;
+        _cureIcon.Modulate = Colors.White;
+        Pop(_cureIcon);
     }
 
-    private void OnAdrenalineStarted() { }
-    private void OnAdrenalineEnded()   { }
-
-    private void UpdateLivesDisplay()
+    private void OnAdrenalineStarted()
     {
-        if (_livesLabel is not null)
+        if (_adrenalineBanner is not null) { _adrenalineBanner.Visible = true; Pop(_adrenalineBanner); }
+        if (_adrenalineFrame is null) return;
+        _adrenalineFrame.Visible = true;
+        _adrenalineTween?.Kill();
+        _adrenalineTween = CreateTween().SetLoops();
+        _adrenalineTween.TweenProperty(_adrenalineFrame, "modulate:a", 0.25f, 0.45f);
+        _adrenalineTween.TweenProperty(_adrenalineFrame, "modulate:a", 1f, 0.45f);
+    }
+
+    private void OnAdrenalineEnded()
+    {
+        _adrenalineTween?.Kill();
+        if (_adrenalineBanner is not null) _adrenalineBanner.Visible = false;
+        if (_adrenalineFrame is not null)  _adrenalineFrame.Visible = false;
+    }
+
+    /// <summary>Dibuja un corazón lleno por cada vida.</summary>
+    private void UpdateLivesDisplay(int? livesOverride = null)
+    {
+        int lives = Mathf.Max(0, livesOverride ?? GameManager.Instance.Lives);
+        if (_livesLabel is not null) _livesLabel.Text = $"x{lives}";
+        if (_hearts is null) return;
+        for (int i = 0; i < _hearts.GetChildCount(); i++)
         {
-            _livesLabel.Text = $"Vidas: {GameManager.Instance.Lives}";
+            if (_hearts.GetChild(i) is TextureRect heart)
+                heart.Texture = i < lives ? _heartFull : _heartEmpty;
         }
+    }
+
+    private void Pop(Control control)
+    {
+        control.PivotOffset = control.Size / 2f;
+        control.Scale = new Vector2(1.5f, 1.5f);
+        var tween = CreateTween();
+        tween.TweenProperty(control, "scale", Vector2.One, 0.25f)
+            .SetTrans(Tween.TransitionType.Back).SetEase(Tween.EaseType.Out);
     }
 
     public override void _ExitTree()

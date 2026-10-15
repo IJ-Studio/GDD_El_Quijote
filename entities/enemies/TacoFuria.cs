@@ -7,11 +7,8 @@ using Godot;
 /// </summary>
 public partial class TacoFuria : Enemy
 {
-    [Export] public float AttackCooldown { get; set; } = 2.0f;
-    [Export] public float AttackDuration { get; set; } = 1.0f;
-
-    private float _timeSinceAttack = 0f;
-    private float _attackTimer = 0f;
+    /// <summary>Cuántas gotas de salsa lanza en cada ataque.</summary>
+    [Export] public int DropsPerAttack { get; set; } = 2;
 
     protected override void InitializeStates()
     {
@@ -25,15 +22,9 @@ public partial class TacoFuria : Enemy
         StateMachine.InitialState = "Guard";
     }
 
-    public override void _PhysicsProcess(double delta)
-    {
-        base._PhysicsProcess(delta);
-        _timeSinceAttack += (float)delta;
-    }
-
     /// <summary>
-    /// Estado de ataque: lanzar salsa en arco.
-    /// Requiere que el jugador bloquee para evitar daño.
+    /// Estado de ataque: lanza salsa en arco hacia el jugador.
+    /// Requiere que el jugador bloquee (o se aleje) para evitar daño.
     /// </summary>
     private class SprayState : EnemyAttackState
     {
@@ -47,49 +38,14 @@ public partial class TacoFuria : Enemy
         public override void Enter()
         {
             base.Enter();
-            _taco._attackTimer = 0f;
-            _taco._timeSinceAttack = 0f;
-        }
-
-        public override void PhysicsUpdate(double delta)
-        {
-            // Aplicar gravedad
-            Vector2 velocity = _taco.Velocity;
-            if (!_taco.IsOnFloor())
+            for (int i = 0; i < _taco.DropsPerAttack; i++)
             {
-                velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+                var p = ProjectilePool.Instance.Get(ProjectileType.SalsaPicante);
+                // cada gota sale con un ángulo distinto para cubrir más espacio
+                float lift = 1.1f - i * 0.35f;
+                p?.Launch(_taco.MuzzlePosition, new Vector2(_taco.Facing, -lift));
             }
-
-            velocity.X = 0f; // Quieto durante ataque
-            _taco.Velocity = velocity;
-            _taco.MoveAndSlide();
-
-            // Contador de duración del ataque
-            _taco._attackTimer += (float)delta;
-
-            // Disparar salsa cada cooldown durante la duración
-            if (_taco._timeSinceAttack >= _taco.AttackCooldown)
-            {
-                SpraySalsa();
-                _taco._timeSinceAttack = 0f;
-            }
-
-            // Terminar ataque después de la duración
-            if (_taco._attackTimer >= _taco.AttackDuration)
-            {
-                _taco.StateMachine.TransitionTo("Guard");
-            }
-        }
-
-        private void SpraySalsa()
-        {
-            var p = ProjectilePool.Instance.Get(ProjectileType.SalsaPicante);
-
-            // Lanzar en arco hacia el jugador
-            Vector2 direction = _taco.Sprite.FlipH ? Vector2.Left : Vector2.Right;
-
-            // Ajustar posición de salida
-            p.Launch(_taco.GlobalPosition, direction);
+            AudioManager.Instance?.PlaySfx("disparo", -10f);
         }
     }
 }

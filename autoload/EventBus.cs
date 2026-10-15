@@ -29,6 +29,15 @@ public partial class EventBus : Node
     [Signal] public delegate void LevelCompletedEventHandler(int levelNumber);
     [Signal] public delegate void EnemyKilledEventHandler(Enemy enemy);
 
+    // ── Señales de combate (retroalimentación visual / sonora) ────
+    [Signal] public delegate void DamageDealtEventHandler(Character target, int amount);
+    [Signal] public delegate void AttackBlockedEventHandler(Character target);
+    [Signal] public delegate void ProjectileBurstEventHandler(Vector2 position, int projectileType);
+
+    // ── Señales de diálogo ────────────────────────────────────────
+    [Signal] public delegate void DialogueRequestedEventHandler(string dialogueId);
+    [Signal] public delegate void DialogueFinishedEventHandler(string dialogueId);
+
     public override void _Ready() => Instance = this;
 
     // Métodos de emisión tipados — evitan SignalName strings dispersos en el código
@@ -44,4 +53,9 @@ public partial class EventBus : Node
     public void EmitLevelCompleted(int n)  => EmitSignal(SignalName.LevelCompleted, n);
     public void EmitEnemyKilled(Enemy e)   => EmitSignal(SignalName.EnemyKilled, e);
     public void EmitPlayerDied(Character p) => EmitSignal(SignalName.PlayerDied, p);
+    public void EmitDamageDealt(Character t, int amount) => EmitSignal(SignalName.DamageDealt, t, amount);
+    public void EmitAttackBlocked(Character t) => EmitSignal(SignalName.AttackBlocked, t);
+    public void EmitProjectileBurst(Vector2 pos, int type) => EmitSignal(SignalName.ProjectileBurst, pos, type);
+    public void EmitDialogueRequested(string id) => EmitSignal(SignalName.DialogueRequested, id);
+    public void EmitDialogueFinished(string id) => EmitSignal(SignalName.DialogueFinished, id);
 }

@@ -1,77 +1,178 @@
-[gd_scene load_steps=15 format=3]
+[gd_scene load_steps=23 format=3]
 
-[ext_resource type="Script" path="res://entities/players/SanchoPanza.cs" id="1_sanchopanza"]
-[ext_resource type="Script" path="res://states/StateMachine.cs" id="2_statemachine"]
-[ext_resource type="Script" path="res://states/player_states/IdleState.cs" id="3_idle"]
-[ext_resource type="Script" path="res://states/player_states/RunState.cs" id="4_run"]
-[ext_resource type="Script" path="res://states/player_states/JumpState.cs" id="5_jump"]
-[ext_resource type="Script" path="res://states/player_states/FallState.cs" id="6_fall"]
-[ext_resource type="Script" path="res://states/player_states/AttackState.cs" id="7_attack"]
-[ext_resource type="Script" path="res://states/player_states/DeadState.cs" id="8_dead"]
-[ext_resource type="Script" path="res://combat/Hitbox.cs" id="9_hitbox"]
-[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="10_hurtbox"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_00.png" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_01.png" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_02.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_03.png" id="4_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_04.png" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_05.png" id="6_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_06.png" id="7_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_07.png" id="8_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_08.png" id="9_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_09.png" id="10_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_10.png" id="11_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_11.png" id="12_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_12.png" id="13_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/sancho/sancho_13.png" id="14_r"]
+[ext_resource type="Script" path="res://entities/players/SanchoPanza.cs" id="15_r"]
+[ext_resource type="Script" path="res://states/StateMachine.cs" id="16_r"]
+[ext_resource type="Script" path="res://combat/Hitbox.cs" id="17_r"]
+[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="18_r"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_player"]
-size = Vector2(32, 64)
+[sub_resource type="SpriteFrames" id="SpriteFrames_1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_r")
+}],
+"loop": true,
+"name": &"run",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("5_r")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("6_r")
+}],
+"loop": false,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}],
+"loop": false,
+"name": &"crouch",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("10_r")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 12.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("11_r")
+}],
+"loop": false,
+"name": &"block",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("12_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_r")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_r")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hitbox"]
-size = Vector2(44, 44)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2"]
+radius = 14.0
+height = 62.0
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_hurtbox"]
-size = Vector2(36, 68)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(54.0, 46.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(32.0, 66.0)
 
 [node name="SanchoPanza" type="CharacterBody2D"]
-script = ExtResource("1_sanchopanza")
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("15_r")
+Speed = 170.0
+MaxHealth = 150
+BodyHeight = 74.0
+InvulnerabilityDuration = 0.8
+InputPrefix = "player2_"
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
-
-[node name="ColorRect" type="ColorRect" parent="."]
-offset_left = -16.0
-offset_top = -32.0
-offset_right = 16.0
-offset_bottom = 32.0
-color = Color(0.8, 0.4, 0.1, 1)
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_1")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0.0, -54.0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-shape = SubResource("RectangleShape2D_player")
+position = Vector2(0.0, -31.0)
+shape = SubResource("CapsuleShape2D_2")
 
 [node name="StateMachine" type="Node" parent="."]
-script = ExtResource("2_statemachine")
-
-[node name="Idle" type="Node" parent="StateMachine"]
-script = ExtResource("3_idle")
-
-[node name="Run" type="Node" parent="StateMachine"]
-script = ExtResource("4_run")
-
-[node name="Jump" type="Node" parent="StateMachine"]
-script = ExtResource("5_jump")
-
-[node name="Fall" type="Node" parent="StateMachine"]
-script = ExtResource("6_fall")
-
-[node name="Attack" type="Node" parent="StateMachine"]
-script = ExtResource("7_attack")
-
-[node name="Dead" type="Node" parent="StateMachine"]
-script = ExtResource("8_dead")
-
-[node name="Camera2D" type="Camera2D" parent="."]
-zoom = Vector2(1.5, 1.5)
-process_callback = 0
-position_smoothing_enabled = true
+script = ExtResource("16_r")
 
 [node name="Hitbox" type="Area2D" parent="."]
-script = ExtResource("9_hitbox")
+collision_layer = 0
+collision_mask = 16
+monitorable = false
+script = ExtResource("17_r")
 Damage = 15
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
-position = Vector2(24, 0)
-shape = SubResource("RectangleShape2D_hitbox")
+position = Vector2(34.0, -40.0)
+shape = SubResource("RectangleShape2D_3")
 
 [node name="Hurtbox" type="Area2D" parent="."]
-script = ExtResource("10_hurtbox")
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("18_r")
 OwnerPath = NodePath("..")
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
-shape = SubResource("RectangleShape2D_hurtbox")
+position = Vector2(0.0, -33.0)
+shape = SubResource("RectangleShape2D_4")

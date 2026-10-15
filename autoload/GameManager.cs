@@ -1,4 +1,5 @@
 // res://autoload/GameManager.cs
+using System.Collections.Generic;
 using Godot;
 
 /// <summary>
@@ -15,6 +16,15 @@ public partial class GameManager : Node
     public bool HasKey       { get; set; } = false;
     public bool HasCure      { get; set; } = false;
     public int  CurrentLevel { get; private set; } = 1;
+    public int  PlayerCount  { get; private set; } = 1;
+
+    /// <summary>Segundos entre la muerte del jugador y el reinicio del nivel (deja ver la animación).</summary>
+    [Export] public float RespawnDelay { get; set; } = 1.6f;
+
+    private bool _respawnPending = false;
+
+    /// <summary>Diálogos ya vistos en esta partida (no se repiten al reintentar un nivel).</summary>
+    public HashSet<string> SeenDialogues { get; } = new();
 
     public GameState State { get; private set; } = GameState.MainMenu;
 
@@ -27,8 +37,14 @@ public partial class GameManager : Node
         EventBus.Instance.LevelCompleted += OnLevelCompleted;
     }
 
-    public void StartGame()
+    public void StartGame() => StartGame(1);
+
+    /// <summary>Inicia una partida nueva con 1 o 2 jugadores.</summary>
+    public void StartGame(int players)
     {
+        PlayerCount = Mathf.Clamp(players, 1, 2);
+        _respawnPending = false;
+        SeenDialogues.Clear();
         Lives = 5;
         HasKey = false;
         HasCure = false;
@@ -38,6 +54,7 @@ public partial class GameManager : Node
         GetTree().ChangeSceneToFile(GetLevelScenePath(CurrentLevel));
     }
 
+    /// <summary>Reinicia el estado de partida sin cambiar de escena (pruebas).</summary>
     public void GoToMainMenu()
     {
         TransitionState(GameState.MainMenu);
@@ -68,6 +85,7 @@ public partial class GameManager : Node
         if (Lives <= 0)
         {
             TransitionState(GameState.GameOver);
+            GetTree().ChangeSceneToFile("res://ui/GameOverScreen.tscn");
         }
         else
         {
@@ -77,7 +95,14 @@ public partial class GameManager : Node
 
     private void OnPlayerDied(Character _)
     {
-        LoseLife();
+        // Espera a que se vea la animación de derrota antes de reiniciar
+        if (_respawnPending) return;
+        _respawnPending = true;
+        GetTree().CreateTimer(RespawnDelay).Timeout += () =>
+        {
+            _respawnPending = false;
+            LoseLife();
+        };
     }
 
     private void OnKeyCollected()          => HasKey  = true;

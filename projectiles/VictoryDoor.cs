@@ -36,7 +36,7 @@ public partial class VictoryDoor : Area2D
     private void OnAreaEntered(Area2D area)
     {
         // Solo reaccionar si toca Hurtbox de un jugador
-        if (area is not Hurtbox hurtbox || hurtbox.Owner is not Character character)
+        if (area is not Hurtbox hurtbox || hurtbox.GetParent() is not Character)
             return;
 
         if (ValidateVictoryConditions())
@@ -63,8 +63,12 @@ public partial class VictoryDoor : Area2D
     private void TriggerVictory()
     {
         GD.PrintRich("[color=green]✓ VICTORIA ALCANZADA[/color]");
-        EventBus.Instance.EmitLevelCompleted(3);
-        GetTree().ChangeSceneToFile("res://ui/MainMenu.tscn"); // O siguiente nivel si existe
+        var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+        if (sprite?.SpriteFrames?.HasAnimation("open") == true) sprite.Play("open");
+        AudioManager.Instance?.PlaySfx("recoger", -4f);
+        SetDeferred(Area2D.PropertyName.Monitoring, false);
+        // GameManager cambia a la pantalla de victoria al recibir LevelCompleted(3)
+        GetTree().CreateTimer(0.8).Timeout += () => EventBus.Instance.EmitLevelCompleted(3);
     }
 
     private void TriggerRejection()

@@ -58,18 +58,18 @@ public abstract partial class BaseProjectile : Area2D
     {
         Show();
         SetProcess(true);
-        Monitoring = true;
-        Monitorable = true;
-        if (Hitbox != null) Hitbox.Monitoring = true;
+        SetDeferred(Area2D.PropertyName.Monitoring, true);
+        SetDeferred(Area2D.PropertyName.Monitorable, true);
+        Hitbox?.SetDeferred(Area2D.PropertyName.Monitoring, true);
     }
 
     public virtual void Disable()
     {
         Hide();
         SetProcess(false);
-        Monitoring = false;
-        Monitorable = false;
-        if (Hitbox != null) Hitbox.Monitoring = false;
+        SetDeferred(Area2D.PropertyName.Monitoring, false);
+        SetDeferred(Area2D.PropertyName.Monitorable, false);
+        Hitbox?.SetDeferred(Area2D.PropertyName.Monitoring, false);
     }
 
     protected virtual void OnAreaEntered(Area2D area)

@@ -1,60 +1,89 @@
-[gd_scene load_steps=2 format=3 uid="uid://bw5pcqn5yy8j"]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://ui/DialogueBox.cs" id="1_4k7hj"]
+[ext_resource type="Script" path="res://ui/DialogueBox.cs" id="1_r"]
+[ext_resource type="Theme" path="res://ui/tema.tres" id="2_r"]
 
-[node name="DialogueBox" type="Control"]
+
+[node name="DialogueBox" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1_r")
+
+[node name="Root" type="Control" parent="."]
 layout_mode = 3
-anchors/left = 0.0
-anchors/top = 0.0
-anchors/right = 1.0
-anchors/bottom = 1.0
-offset/left = 0.0
-offset/top = 0.0
-offset/right = 0.0
-offset/bottom = 0.0
-script = SubResource("1_4k7hj")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("2_r")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Oscuro" type="ColorRect" parent="Root"]
 layout_mode = 1
-anchors/left = 0.0
-anchors/top = 0.0
-anchors/right = 1.0
-anchors/bottom = 1.0
-offset/left = 0.0
-offset/top = 0.0
-offset/right = 0.0
-offset/bottom = 0.0
-modulate/color = Color(0, 0, 0, 0.7)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.82)
 
-[node name="DialoguePanel" type="Panel" parent="."]
+[node name="Image" type="TextureRect" parent="Root"]
 layout_mode = 1
-anchors/left = 0.1
-anchors/top = 0.7
-anchors/right = 0.9
-anchors/bottom = 0.95
-offset/left = 0.0
-offset/top = 0.0
-offset/right = 0.0
-offset/bottom = 0.0
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -470.0
+offset_top = 24.0
+offset_right = 470.0
+offset_bottom = 474.0
+grow_horizontal = 2
+expand_mode = 1
+stretch_mode = 5
+mouse_filter = 2
 
-[node name="VBoxContainer" type="VBoxContainer" parent="DialoguePanel"]
+[node name="DialoguePanel" type="PanelContainer" parent="Root"]
 layout_mode = 1
-anchors/left = 0.0
-anchors/top = 0.0
-anchors/right = 1.0
-anchors/bottom = 1.0
-offset/left = 10.0
-offset/top = 10.0
-offset/right = -10.0
-offset/bottom = -10.0
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 150.0
+offset_top = -232.0
+offset_right = -150.0
+offset_bottom = -28.0
+grow_horizontal = 2
+grow_vertical = 0
 
-[node name="LabelCharacter" type="Label" parent="DialoguePanel/VBoxContainer"]
+[node name="Margin" type="MarginContainer" parent="Root/DialoguePanel"]
 layout_mode = 2
-text = "El Patrón"
-custom_minimum_size = Vector2(0, 30)
+theme_override_constants/margin_left = 16
+theme_override_constants/margin_top = 10
+theme_override_constants/margin_right = 16
+theme_override_constants/margin_bottom = 10
 
-[node name="LabelDialogue" type="Label" parent="DialoguePanel/VBoxContainer"]
+[node name="VBox" type="VBoxContainer" parent="Root/DialoguePanel/Margin"]
 layout_mode = 2
-text = "¡La Cura de la Sazón ha desaparecido!"
-autowrap_mode = 2
-custom_minimum_size = Vector2(0, 60)
+theme_override_constants/separation = 14
+
+[node name="LabelCharacter" type="Label" parent="Root/DialoguePanel/Margin/VBox"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 16
+theme_override_colors/font_color = Color(1, 0.82, 0.3, 1)
+
+[node name="LabelDialogue" type="Label" parent="Root/DialoguePanel/Margin/VBox"]
+layout_mode = 2
+text = ""
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 15
+autowrap_mode = 3
+custom_minimum_size = Vector2(0.0, 96.0)
+
+[node name="Hint" type="Label" parent="Root/DialoguePanel"]
+layout_mode = 2
+size_flags_horizontal = 8
+size_flags_vertical = 8
+text = "ENTER >"
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(1, 0.82, 0.3, 1)

@@ -19,14 +19,8 @@ public partial class SalsaPicante : BaseProjectile
     {
         base.Launch(position, direction);
 
-        // Calcular velocidad inicial con ángulo de 45 grados
-        float angle = direction.Y < 0 ? -Mathf.Pi / 4 : Mathf.Pi / 4;
-        _velocity = new Vector2(
-            Mathf.Cos(angle) * Speed,
-            Mathf.Sin(angle) * Speed
-        );
-
-        if (direction.X < 0) _velocity.X *= -1;
+        // Velocidad inicial en la dirección pedida (los enemigos apuntan hacia arriba para hacer el arco)
+        _velocity = Direction * Speed;
 
         _hasExploded = false;
     }
@@ -77,13 +71,16 @@ public partial class SalsaPicante : BaseProjectile
     {
         if (_hasExploded) return;
         _hasExploded = true;
+        EventBus.Instance.EmitProjectileBurst(GlobalPosition, (int)Type);
 
         // Buscar todas las Hurtbox en el área de explosión
         var space = GetWorld2D().DirectSpaceState;
         var query = new PhysicsShapeQueryParameters2D();
         query.Shape = new CircleShape2D { Radius = ExplosionRadius };
         query.Transform = GlobalTransform;
-        query.CollisionMask = 4; // Collision layer de Hurtbox
+        query.CollisionMask = 8; // Capa "hurtbox_jugador"
+        query.CollideWithAreas = true;
+        query.CollideWithBodies = false;
 
         var results = space.IntersectShape(query);
         foreach (var result in results)

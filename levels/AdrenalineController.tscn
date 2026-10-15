@@ -1,26 +1,51 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8q9b3d0y52kl"]
+[gd_scene load_steps=7 format=3]
 
-[ext_resource type="Script" path="res://levels/AdrenalineController.cs" id="1"]
+[ext_resource type="Script" path="res://levels/AdrenalineController.cs" id="1_r"]
+[ext_resource type="PackedScene" path="res://projectiles/FoodPickup.tscn" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/cofre_0.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/cofre_1.png" id="4_r"]
 
-[sub_resource type="RectangleShape2D" id="RectangleShape2D_trigger"]
-size = Vector2(400, 300)
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(700.0, 300.0)
 
-[node name="AdrenalineController" type="Node"]
-script = ExtResource("1")
+[sub_resource type="SpriteFrames" id="SpriteFrames_2"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_r")
+}],
+"loop": false,
+"name": &"closed",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_r")
+}],
+"loop": false,
+"name": &"open",
+"speed": 1.0
+}]
+
+[node name="AdrenalineController" type="Node2D" node_paths=PackedStringArray("TriggerZone")]
+position = Vector2(0.0, 0.0)
+script = ExtResource("1_r")
 MinDuration = 15.0
 MaxDuration = 30.0
+TriggerZone = NodePath("TriggerZone")
+RewardScene = ExtResource("2_r")
 
 [node name="TriggerZone" type="Area2D" parent="."]
-position = Vector2(600, 350)
 collision_layer = 0
-collision_mask = 3
+collision_mask = 6
+monitorable = false
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="TriggerZone"]
-shape = SubResource("RectangleShape2D_trigger")
+position = Vector2(0.0, -120.0)
+shape = SubResource("RectangleShape2D_1")
 
-[node name="ColorRect" type="ColorRect" parent="TriggerZone"]
-offset_left = -200.0
-offset_top = -150.0
-offset_right = 200.0
-offset_bottom = 150.0
-color = Color(1, 0.5, 0, 0.1)
+[node name="Cofre" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_2")
+animation = &"closed"
+offset = Vector2(0.0, -27.0)

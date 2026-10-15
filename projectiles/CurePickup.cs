@@ -97,15 +97,25 @@ public partial class CurePickup : Area2D
         // Marcar en GameManager
         GameManager.Instance.HasCure = true;
 
-        // Emitir señal a través del EventBus
+        // Emitir señales a través del EventBus (HUD y diálogo escuchan)
+        EventBus.Instance.EmitCureCollected();
         EventBus.Instance.EmitCureObtained();
+        AudioManager.Instance?.PlaySfx("curar", -4f);
 
-        // Feedback visual: desaparecer
-        var tween = CreateTween();
-        tween.SetTrans(Tween.TransitionType.Quad);
-        tween.SetEase(Tween.EaseType.In);
-        tween.TweenProperty(this, "modulate", Colors.Transparent, 0.3f);
-        tween.TweenCallback(Callable.From(() => Hide()));
+        // Feedback visual: el pedestal se queda vacío (o desaparece si no hay sprite)
+        var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
+        if (sprite?.SpriteFrames?.HasAnimation("empty") == true)
+        {
+            sprite.Play("empty");
+        }
+        else
+        {
+            var tween = CreateTween();
+            tween.SetTrans(Tween.TransitionType.Quad);
+            tween.SetEase(Tween.EaseType.In);
+            tween.TweenProperty(this, "modulate", Colors.Transparent, 0.3f);
+            tween.TweenCallback(Callable.From(() => Hide()));
+        }
 
         GD.Print("[CurePickup] ¡Cura de la Sazón obtenida! GameManager.HasCure = true");
     }

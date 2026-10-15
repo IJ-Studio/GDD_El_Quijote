@@ -3,13 +3,15 @@ using Godot;
 
 /// <summary>
 /// Estado base de ataque para enemigos. Maneja la animación de ataque y la
-/// activación de la Hitbox. Transiciona de vuelta a Guard al terminar.
+/// activación de la Hitbox. Transiciona de vuelta a Guard al terminar
+/// y reinicia el tiempo de espera entre ataques.
 /// </summary>
 public class EnemyAttackState : IState
 {
     protected readonly Enemy Owner;
     protected readonly string AnimName;
     protected readonly string ReturnState;
+    private bool _listening;
 
     public EnemyAttackState(Enemy owner, string animName = "attack", string returnState = "Guard")
     {
@@ -20,42 +22,48 @@ public class EnemyAttackState : IState
 
     public virtual void Enter()
     {
+        Owner.Velocity = new Vector2(0, Owner.Velocity.Y);
         Owner.Sprite.Play(AnimName);
-        Owner.Sprite.AnimationFinished += OnAnimationFinished;
-        if (Owner.Hitbox != null)
-        {
-            Owner.Hitbox.Monitoring = true;
-        }
+        Listen(true);
+        Owner.Hitbox?.SetDeferred(Area2D.PropertyName.Monitoring, true);
     }
 
     public virtual void Update(double delta) { }
 
     public virtual void PhysicsUpdate(double delta)
     {
-        // Aplicar gravedad básica si es necesario
+        Vector2 velocity = Owner.Velocity;
+        velocity.X = Mathf.MoveToward(velocity.X, 0, 600f * (float)delta);
         if (!Owner.IsOnFloor())
-        {
-            Vector2 velocity = Owner.Velocity;
-            velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
-            Owner.Velocity = velocity;
-            Owner.MoveAndSlide();
-        }
+            velocity.Y += Character.Gravity * (float)delta;
+        Owner.Velocity = velocity;
+        Owner.MoveAndSlide();
     }
 
     public virtual void Exit()
     {
-        Owner.Sprite.AnimationFinished -= OnAnimationFinished;
+        Listen(false);
+        Owner.CooldownLeft = Owner.GuardCooldown;
         if (Owner.Hitbox != null)
         {
-            Owner.Hitbox.Monitoring = false;
+            Owner.Hitbox.SetDeferred(Area2D.PropertyName.Monitoring, false);
         }
+    }
+
+    /// <summary>Conecta/desconecta AnimationFinished sin duplicar ni quitar conexiones inexistentes.</summary>
+    protected void Listen(bool on)
+    {
+        if (on == _listening) return;
+        if (on) Owner.Sprite.AnimationFinished += OnAnimationFinished;
+        else Owner.Sprite.AnimationFinished -= OnAnimationFinished;
+        _listening = on;
     }
 
     protected virtual void OnAnimationFinished()
     {
         if (Owner.Sprite.Animation == AnimName)
         {
-            Owner.StateMachine.TransitionTo(ReturnState);
+            Owner.StateMachine.TransitionTo(Owner.IsAdrenalineActive ? "Alert" : ReturnState);
         }
     }
 }

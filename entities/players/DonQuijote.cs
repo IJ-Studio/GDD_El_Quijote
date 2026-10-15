@@ -11,14 +11,13 @@ public partial class DonQuijote : Character
 
     protected override void InitializeStates()
     {
-        Speed = 200f;
-        MaxHealth = 120;
 
         _blockState = new BlockState(this);
 
         StateMachine.RegisterState("Idle",   new IdleState(this));
         StateMachine.RegisterState("Run",    new RunState(this));
         StateMachine.RegisterState("Jump",   new JumpState(this));
+        StateMachine.RegisterState("Fall",   new FallState(this));
         StateMachine.RegisterState("Crouch", new CrouchState(this));
         StateMachine.RegisterState("Attack", new AttackState(this));
         StateMachine.RegisterState("Block",  _blockState);

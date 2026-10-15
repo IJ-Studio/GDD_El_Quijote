@@ -19,7 +19,8 @@ public partial class PauseMenu : Control
         _buttonResume.Pressed += OnResumePressed;
         _buttonMainMenu.Pressed += OnMainMenuPressed;
 
-        // Inicialmente oculto
+        // Inicialmente oculto; debe seguir recibiendo input con el juego en pausa
+        ProcessMode = ProcessModeEnum.Always;
         Visible = false;
 
         GD.PrintRich("[color=yellow]PauseMenu: Script de pausa inicializado[/color]");
@@ -27,7 +28,9 @@ public partial class PauseMenu : Control
 
     public override void _UnhandledInput(InputEvent @event)
     {
-        if (@event.IsActionPressed("ui_cancel") || @event.IsActionPressed("pause_menu"))
+        // No abrir la pausa encima de un diálogo
+        bool dialogueOpen = GetTree().Paused && !_isPauseMenuVisible;
+        if ((@event.IsActionPressed("ui_cancel") || @event.IsActionPressed("pause_menu")) && !dialogueOpen)
         {
             TogglePauseMenu();
             GetTree().Root.SetInputAsHandled();
@@ -42,6 +45,7 @@ public partial class PauseMenu : Control
         if (_isPauseMenuVisible)
         {
             GetTree().Paused = true;
+            _buttonResume?.GrabFocus();
             GD.PrintRich("[color=yellow]PauseMenu: Juego pausado[/color]");
         }
         else
@@ -63,7 +67,7 @@ public partial class PauseMenu : Control
     {
         GetTree().Paused = false;
         GD.PrintRich("[color=orange]PauseMenu: Volviendo al menú principal[/color]");
-        GetTree().ChangeSceneToFile("res://ui/MainMenu.tscn");
+        GameManager.Instance.GoToMainMenu();
     }
 
     public override void _ExitTree()

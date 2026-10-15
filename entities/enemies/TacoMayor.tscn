@@ -1,72 +1,212 @@
-[gd_scene load_steps=15 format=3 uid="uid://d0c8oy5qpq3s"]
+[gd_scene load_steps=27 format=3]
 
-[ext_resource type="Script" path="res://entities/enemies/TacoMayor.cs" id="1_script"]
-[ext_resource type="Script" path="res://states/StateMachine.cs" id="2_statemachine"]
-[ext_resource type="Script" path="res://states/enemy_states/GuardState.cs" id="3_guard"]
-[ext_resource type="Script" path="res://states/enemy_states/EnemyDeadState.cs" id="4_dead"]
-[ext_resource type="Script" path="res://combat/Hitbox.cs" id="5_hitbox"]
-[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="6_hurtbox"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_00.png" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_01.png" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_02.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_03.png" id="4_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_04.png" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_05.png" id="6_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_06.png" id="7_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_07.png" id="8_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_08.png" id="9_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_09.png" id="10_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_10.png" id="11_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_11.png" id="12_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_12.png" id="13_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_13.png" id="14_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_14.png" id="15_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_15.png" id="16_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/taco_mayor/taco_mayor_16.png" id="17_r"]
+[ext_resource type="Script" path="res://entities/enemies/TacoMayor.cs" id="18_r"]
+[ext_resource type="Script" path="res://states/StateMachine.cs" id="19_r"]
+[ext_resource type="Script" path="res://combat/Hitbox.cs" id="20_r"]
+[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="21_r"]
 
-[sub_resource type="RectangleShape2D" id="1_rect"]
-size = Vector2(48, 64)
+[sub_resource type="SpriteFrames" id="SpriteFrames_1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("3_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("4_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_r")
+}],
+"loop": false,
+"name": &"intro",
+"speed": 4.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("9_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("8_r")
+}],
+"loop": true,
+"name": &"walk",
+"speed": 7.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_r")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("13_r")
+}],
+"loop": true,
+"name": &"charge",
+"speed": 8.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("14_r")
+}],
+"loop": false,
+"name": &"barrage",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_r")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("16_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_r")
+}],
+"loop": false,
+"name": &"death",
+"speed": 4.0
+}]
 
-[sub_resource type="RectangleShape2D" id="2_rect"]
-size = Vector2(60, 70)
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2"]
+radius = 34.0
+height = 136.0
 
-[sub_resource type="CircleShape2D" id="3_circle"]
-radius = 100.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(70.0, 110.0)
 
-[node name="TacoMayor" type="CharacterBody2D"]
-script = ExtResource("1_script")
-MaxHealth = 150
-CurrentHealth = 150
-Speed = 90
-MaxHealthPhase1 = 150
-MaxHealthPhase2 = 150
-MaxHealthPhase3 = 150
-AttackCooldownPhase1 = 3.0
-AttackCooldownPhase2 = 1.8
-AttackCooldownPhase3 = 0.7
-ChargeSpeedPhase3 = 280.0
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(76.0, 140.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5"]
+size = Vector2(1500.0, 420.0)
+
+[node name="TacoMayor" type="CharacterBody2D" node_paths=PackedStringArray("GuardZone")]
+collision_layer = 4
+collision_mask = 1
+script = ExtResource("18_r")
+Speed = 90.0
+MaxHealth = 220
+BodyHeight = 140.0
+GuardCooldown = 2.0
+PatrolDistance = 0.0
+InvulnerabilityDuration = 0.25
+ChargeSpeedPhase3 = 300.0
+GuardZone = NodePath("GuardZone")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
 texture_filter = 1
-offset = Vector2(0, -32)
-
-[node name="ColorRect" type="ColorRect" parent="."]
-offset_left = -24.0
-offset_top = -32.0
-offset_right = 24.0
-offset_bottom = 32.0
-color = Color(0.8, 0.2, 0.1, 1)
+sprite_frames = SubResource("SpriteFrames_1")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0.0, -77.0)
 
 [node name="CollisionShape2D" type="CollisionShape2D" parent="."]
-position = Vector2(0, -32)
-shape = SubResource("1_rect")
+position = Vector2(0.0, -68.0)
+shape = SubResource("CapsuleShape2D_2")
 
 [node name="StateMachine" type="Node" parent="."]
-script = ExtResource("2_statemachine")
+script = ExtResource("19_r")
 
 [node name="Hitbox" type="Area2D" parent="."]
-collision_layer = 2
-collision_mask = 4
+collision_layer = 0
+collision_mask = 8
+monitorable = false
+script = ExtResource("20_r")
+Damage = 18
 
-[node name="CollisionShape2D" parent="Hitbox"]
-position = Vector2(0, -32)
-shape = SubResource("2_rect")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(48.0, -70.0)
+shape = SubResource("RectangleShape2D_3")
 
 [node name="Hurtbox" type="Area2D" parent="."]
-collision_layer = 4
-collision_mask = 2
+collision_layer = 16
+collision_mask = 0
+monitoring = false
+script = ExtResource("21_r")
+OwnerPath = NodePath("..")
 
-[node name="CollisionShape2D" parent="Hurtbox"]
-position = Vector2(0, -32)
-shape = SubResource("2_rect")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0.0, -70.0)
+shape = SubResource("RectangleShape2D_4")
 
 [node name="GuardZone" type="Area2D" parent="."]
-position = Vector2(0, -32)
 collision_layer = 0
-collision_mask = 0
+collision_mask = 2
+monitorable = false
 
-[node name="CollisionShape2D" parent="GuardZone"]
-shape = SubResource("3_circle")
+[node name="CollisionShape2D" type="CollisionShape2D" parent="GuardZone"]
+position = Vector2(0.0, -180.0)
+shape = SubResource("RectangleShape2D_5")

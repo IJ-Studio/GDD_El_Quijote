@@ -1,72 +1,89 @@
-[gd_scene load_steps=2 format=3 uid="uid://dui2lqvj3c1x"]
+[gd_scene load_steps=4 format=3]
 
-[ext_resource type="Script" path="res://ui/VictoryScreen.cs" id="1_7hmnd"]
+[ext_resource type="Theme" path="res://ui/tema.tres" id="1_r"]
+[ext_resource type="Script" path="res://ui/VictoryScreen.cs" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/dialogos/escena_5.png" id="3_r"]
+
 
 [node name="VictoryScreen" type="Control"]
 layout_mode = 3
-anchors/left = 0.0
-anchors/top = 0.0
-anchors/right = 1.0
-anchors/bottom = 1.0
-offset/left = 0.0
-offset/top = 0.0
-offset/right = 0.0
-offset/bottom = 0.0
-script = SubResource("1_7hmnd")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+theme = ExtResource("1_r")
+script = ExtResource("2_r")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Fondo" type="TextureRect" parent="."]
 layout_mode = 1
-anchors/left = 0.0
-anchors/top = 0.0
-anchors/right = 1.0
-anchors/bottom = 1.0
-offset/left = 0.0
-offset/top = 0.0
-offset/right = 0.0
-offset/bottom = 0.0
-modulate/color = Color(0.1, 0.1, 0.2, 1)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("3_r")
+expand_mode = 1
+stretch_mode = 6
 
-[node name="VBoxContainer" type="VBoxContainer" parent="."]
+[node name="Oscuro" type="ColorRect" parent="."]
 layout_mode = 1
-anchors/left = 0.5
-anchors/top = 0.5
-anchors/right = 0.5
-anchors/bottom = 0.5
-offset/left = -300.0
-offset/top = -250.0
-offset/right = 300.0
-offset/bottom = 250.0
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.6)
+
+[node name="Layout" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -500.0
+offset_top = -300.0
+offset_right = 500.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
+theme_override_constants/separation = 22
 
-[node name="LabelTitle" type="Label" parent="VBoxContainer"]
+[node name="LabelTitle" type="Label" parent="Layout"]
 layout_mode = 2
-text = "¡VICTORIA!"
+text = "¡CURA RECUPERADA!"
 horizontal_alignment = 1
-custom_minimum_size = Vector2(600, 80)
+theme_override_font_sizes/font_size = 40
+theme_override_colors/font_color = Color(1, 0.82, 0.3, 1)
+theme_override_constants/outline_size = 10
 
-[node name="Spacer" type="Control" parent="VBoxContainer"]
+[node name="LabelQuote" type="Label" parent="Layout"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 20)
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 14
+autowrap_mode = 3
 
-[node name="ScrollContainer" type="ScrollContainer" parent="VBoxContainer"]
+[node name="LabelCredits" type="Label" parent="Layout"]
 layout_mode = 2
-custom_minimum_size = Vector2(600, 300)
+text = ""
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 12
+theme_override_colors/font_color = Color(0.9, 0.9, 0.85, 1)
 
-[node name="LabelCredits" type="Label" parent="VBoxContainer/ScrollContainer"]
+[node name="Buttons" type="HBoxContainer" parent="Layout"]
 layout_mode = 2
-text = "Créditos..."
-autowrap_mode = 2
+alignment = 1
+theme_override_constants/separation = 24
 
-[node name="Spacer2" type="Control" parent="VBoxContainer"]
+[node name="ButtonMainMenu" type="Button" parent="Layout/Buttons"]
 layout_mode = 2
-custom_minimum_size = Vector2(0, 20)
+text = "MENU PRINCIPAL"
 
-[node name="ButtonMainMenu" type="Button" parent="VBoxContainer"]
+[node name="ButtonExit" type="Button" parent="Layout/Buttons"]
 layout_mode = 2
-text = "Menú Principal"
-custom_minimum_size = Vector2(300, 50)
-
-[node name="ButtonExit" type="Button" parent="VBoxContainer"]
-layout_mode = 2
-text = "Salir"
-custom_minimum_size = Vector2(300, 50)
+text = "SALIR"

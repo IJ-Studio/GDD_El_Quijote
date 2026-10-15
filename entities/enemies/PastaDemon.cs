@@ -7,9 +7,8 @@ using Godot;
 /// </summary>
 public partial class PastaDemon : Enemy
 {
-    [Export] public float AttackCooldown { get; set; } = 1.5f;
-
-    private float _timeSinceAttack = 0f;
+    /// <summary>Inclinación del lanzamiento (0 = horizontal, 1 = 45° hacia arriba).</summary>
+    [Export] public float TossArc { get; set; } = 0.9f;
 
     protected override void InitializeStates()
     {
@@ -23,19 +22,13 @@ public partial class PastaDemon : Enemy
         StateMachine.InitialState = "Guard";
     }
 
-    public override void _PhysicsProcess(double delta)
-    {
-        base._PhysicsProcess(delta);
-        _timeSinceAttack += (float)delta;
-    }
-
     /// <summary>
-    /// Estado de ataque: lanzar albóndigas.
-    /// Implementa la lógica de toss con cooldown.
+    /// Estado de ataque: lanza una albóndiga en arco cuando el brazo llega al frente.
     /// </summary>
     private class TossState : EnemyAttackState
     {
         private readonly PastaDemon _demon;
+        private bool _thrown;
 
         public TossState(PastaDemon owner) : base(owner, "attack")
         {
@@ -45,45 +38,23 @@ public partial class PastaDemon : Enemy
         public override void Enter()
         {
             base.Enter();
-            _demon._timeSinceAttack = 0f;
+            _thrown = false;
+            _demon.Sprite.FrameChanged += OnFrameChanged;
         }
 
-        public override void PhysicsUpdate(double delta)
+        public override void Exit()
         {
-            // Aplicar gravedad
-            Vector2 velocity = _demon.Velocity;
-            if (!_demon.IsOnFloor())
-            {
-                velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
-            }
-
-            velocity.X = 0f; // Quieto durante ataque
-            _demon.Velocity = velocity;
-            _demon.MoveAndSlide();
-
-            // Disparar si tiempo suficiente
-            if (_demon._timeSinceAttack >= _demon.AttackCooldown)
-            {
-                TossAlbondiga();
-                _demon._timeSinceAttack = 0f;
-            }
-
-            // Terminar ataque después de algunos disparos
-            if (_demon._timeSinceAttack > _demon.AttackCooldown * 3)
-            {
-                _demon.StateMachine.TransitionTo("Guard");
-            }
+            _demon.Sprite.FrameChanged -= OnFrameChanged;
+            base.Exit();
         }
 
-        private void TossAlbondiga()
+        private void OnFrameChanged()
         {
+            if (_thrown || _demon.Sprite.Frame < 1) return;
+            _thrown = true;
             var p = ProjectilePool.Instance.Get(ProjectileType.Albondiga);
-
-            // Lanzar en arco hacia el jugador
-            Vector2 direction = _demon.Sprite.FlipH ? Vector2.Left : Vector2.Right;
-
-            // Ajustar posición de salida (similar a SliceOPizza)
-            p.Launch(_demon.GlobalPosition, direction);
+            p?.Launch(_demon.MuzzlePosition, new Vector2(_demon.Facing, -_demon.TossArc));
+            AudioManager.Instance?.PlaySfx("disparo", -10f);
         }
     }
 }

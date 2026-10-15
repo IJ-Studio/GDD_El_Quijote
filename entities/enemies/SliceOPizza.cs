@@ -11,10 +11,10 @@ public partial class SliceOPizza : Enemy
         StateMachine.RegisterState("Guard", new GuardState(this));
         StateMachine.RegisterState("EnemyAttack", new ShootState(this));
         StateMachine.RegisterState("Dead", new EnemyDeadState(this));
-        
+
         // El estado Alert se activa por la Oleada de Adrenalina
         StateMachine.RegisterState("Alert", new GuardState(this, "EnemyAttack"));
-        
+
         StateMachine.InitialState = "Guard";
     }
 
@@ -25,15 +25,11 @@ public partial class SliceOPizza : Enemy
         public override void Enter()
         {
             base.Enter();
-            
-            // Disparar proyectil desde el pool
+
+            // Disparar proyectil desde el pool, hacia donde mira
             var p = ProjectilePool.Instance.Get(ProjectileType.HiloDeQueso);
-            
-            // Determinar dirección basada en el flip del sprite
-            Vector2 direction = Owner.Sprite.FlipH ? Vector2.Left : Vector2.Right;
-            
-            // Ajustar posición de salida si es necesario
-            p.Launch(Owner.GlobalPosition, direction);
+            p?.Launch(Owner.MuzzlePosition, new Vector2(Owner.Facing, 0));
+            AudioManager.Instance?.PlaySfx("disparo", -10f);
         }
     }
 }

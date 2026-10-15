@@ -1,59 +1,57 @@
-[gd_scene load_steps=2 format=3 uid="uid://c8lr3yffgk02"]
+[gd_scene load_steps=3 format=3]
 
-[ext_resource type="Script" path="res://ui/PauseMenu.cs" id="1_3qgf5"]
+[ext_resource type="Theme" path="res://ui/tema.tres" id="1_r"]
+[ext_resource type="Script" path="res://ui/PauseMenu.cs" id="2_r"]
+
 
 [node name="PauseMenu" type="Control"]
 layout_mode = 3
-anchors/left = 0.0
-anchors/top = 0.0
-anchors/right = 1.0
-anchors/bottom = 1.0
-offset/left = 0.0
-offset/top = 0.0
-offset/right = 0.0
-offset/bottom = 0.0
-script = SubResource("1_3qgf5")
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+process_mode = 3
+theme = ExtResource("1_r")
+script = ExtResource("2_r")
 
-[node name="Panel" type="Panel" parent="."]
+[node name="Panel" type="ColorRect" parent="."]
 layout_mode = 1
-anchors/left = 0.0
-anchors/top = 0.0
-anchors/right = 1.0
-anchors/bottom = 1.0
-offset/left = 0.0
-offset/top = 0.0
-offset/right = 0.0
-offset/bottom = 0.0
-modulate/color = Color(0, 0, 0, 0.5)
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+color = Color(0, 0, 0, 0.6)
 
 [node name="VBoxContainer" type="VBoxContainer" parent="."]
 layout_mode = 1
-anchors/left = 0.5
-anchors/top = 0.5
-anchors/right = 0.5
-anchors/bottom = 0.5
-offset/left = -150.0
-offset/top = -100.0
-offset/right = 150.0
-offset/bottom = 100.0
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -210.0
+offset_top = -120.0
+offset_right = 210.0
+offset_bottom = 120.0
+grow_horizontal = 2
+grow_vertical = 2
 alignment = 1
+theme_override_constants/separation = 14
 
 [node name="LabelTitle" type="Label" parent="VBoxContainer"]
 layout_mode = 2
 text = "PAUSA"
 horizontal_alignment = 1
-custom_minimum_size = Vector2(300, 60)
-
-[node name="Spacer" type="Control" parent="VBoxContainer"]
-layout_mode = 2
-custom_minimum_size = Vector2(0, 20)
+theme_override_font_sizes/font_size = 32
+theme_override_colors/font_color = Color(1, 0.82, 0.3, 1)
 
 [node name="ButtonResume" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "Reanudar (ESC)"
-custom_minimum_size = Vector2(300, 50)
+text = "CONTINUAR"
 
 [node name="ButtonMainMenu" type="Button" parent="VBoxContainer"]
 layout_mode = 2
-text = "Menú Principal"
-custom_minimum_size = Vector2(300, 50)
+text = "MENU PRINCIPAL"

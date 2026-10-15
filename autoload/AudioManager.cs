@@ -1,4 +1,5 @@
 // res://autoload/AudioManager.cs
+using System.Collections.Generic;
 using Godot;
 
 /// <summary>
@@ -15,9 +16,23 @@ public partial class AudioManager : Node
 
     private AudioStreamPlayer? _musicPlayer;
 
+    // ── Efectos de sonido (SFX) ───────────────────────────────────
+    private const string SfxFolder = "res://assets/audio/sfx/";
+    private const int SfxVoices = 12;
+    private readonly Dictionary<string, AudioStream> _sfxCache = new();
+    private readonly List<AudioStreamPlayer> _sfxPlayers = new();
+    private int _nextVoice = 0;
+
     public override void _Ready()
     {
         Instance = this;
+        ProcessMode = ProcessModeEnum.Always;
+        for (int i = 0; i < SfxVoices; i++)
+        {
+            var player = new AudioStreamPlayer();
+            AddChild(player);
+            _sfxPlayers.Add(player);
+        }
         EventBus.Instance.AdrenalineStarted += OnAdrenalineStarted;
         EventBus.Instance.AdrenalineEnded   += OnAdrenalineEnded;
     }
@@ -73,6 +88,28 @@ public partial class AudioManager : Node
         }
 
         return null;
+    }
+
+    /// <summary>
+    /// Reproduce un efecto de sonido por nombre (archivo en res://assets/audio/sfx/NOMBRE.wav).
+    /// Usa un grupo fijo de voces para no crear nodos en cada golpe.
+    /// </summary>
+    public void PlaySfx(string name, float volumeDb = -6f)
+    {
+        if (!_sfxCache.TryGetValue(name, out var stream))
+        {
+            string path = SfxFolder + name + ".wav";
+            if (!ResourceLoader.Exists(path)) return;
+            stream = GD.Load<AudioStream>(path);
+            _sfxCache[name] = stream;
+        }
+
+        var player = _sfxPlayers[_nextVoice];
+        _nextVoice = (_nextVoice + 1) % _sfxPlayers.Count;
+        player.Stream = stream;
+        player.VolumeDb = volumeDb;
+        player.PitchScale = (float)GD.RandRange(0.94, 1.06);
+        player.Play();
     }
 
     public override void _ExitTree()

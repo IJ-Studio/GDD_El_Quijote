@@ -2,14 +2,12 @@
 using Godot;
 
 /// <summary>
-/// Estado de salto (Jump) del jugador.
+/// Estado de salto (Jump) del jugador. Pasa a Fall al empezar a caer.
 /// </summary>
 public partial class JumpState : Node, IState
 {
-    private const string ANIM_JUMP = "jump";
     private Character _owner = null!;
-    [Export] private float _jumpForce = -400f;
-
+    [Export] private float _jumpForce = -470f;
     public JumpState() { }
     public JumpState(Character owner) => _owner = owner;
 
@@ -25,32 +23,34 @@ public partial class JumpState : Node, IState
 
     public void Enter()
     {
-        _owner.Sprite.Play(ANIM_JUMP);
+        _owner.Sprite.Play("jump");
         Vector2 velocity = _owner.Velocity;
         velocity.Y = _jumpForce;
         _owner.Velocity = velocity;
+        AudioManager.Instance?.PlaySfx("salto", -10f);
     }
 
     public void Update(double delta)
     {
-        if (_owner.IsActionPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
+        if (_owner.IsActionJustPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
         {
             _owner.StateMachine.TransitionTo("Attack");
             return;
         }
 
-        if (_owner.IsOnFloor())
+        if (_owner.Velocity.Y >= 0f)
         {
-            _owner.StateMachine.TransitionTo("Idle");
+            _owner.StateMachine.TransitionTo(_owner.IsOnFloor() ? "Idle" : "Fall");
         }
     }
 
     public void PhysicsUpdate(double delta)
     {
         float direction = _owner.GetAxis("left", "right");
+        if (!Mathf.IsZeroApprox(direction)) _owner.SetFacing(direction < 0 ? -1 : 1);
         Vector2 velocity = _owner.Velocity;
         velocity.X = direction * _owner.Speed;
-        velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+        velocity.Y += Character.Gravity * (float)delta;
         _owner.Velocity = velocity;
         _owner.MoveAndSlide();
     }

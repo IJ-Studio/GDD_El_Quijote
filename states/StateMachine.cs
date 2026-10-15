@@ -48,10 +48,18 @@ public partial class StateMachine : Node
     }
 
     public override void _Process(double delta)          => _current?.Update(delta);
+
+    /// <summary>Libera los estados que son nodos creados por código (no viven en el árbol).</summary>
+    public override void _ExitTree()
+    {
+        foreach (var state in _states.Values)
+        {
+            if (state is Node node && !node.IsInsideTree() && IsInstanceValid(node))
+                node.QueueFree();
+        }
+    }
     public override void _PhysicsProcess(double delta)   => _current?.PhysicsUpdate(delta);
 
     public string CurrentStateName =>
-        _states.TryGetValue(_current?.GetType().Name ?? "", out _)
-            ? _states.First(kv => kv.Value == _current).Key
-            : "Unknown";
+        _current is null ? "None" : _states.FirstOrDefault(kv => kv.Value == _current).Key ?? "Unknown";
 }

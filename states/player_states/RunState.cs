@@ -6,7 +6,6 @@ using Godot;
 /// </summary>
 public partial class RunState : Node, IState
 {
-    private const string ANIM_RUN = "run";
     private Character _owner = null!;
 
     public RunState() { }
@@ -24,12 +23,12 @@ public partial class RunState : Node, IState
 
     public void Enter()
     {
-        _owner.Sprite.Play(ANIM_RUN);
+        _owner.Sprite.Play("run");
     }
 
     public void Update(double delta)
     {
-        if (_owner.IsActionPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
+        if (_owner.IsActionJustPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
         {
             _owner.StateMachine.TransitionTo("Attack");
             return;
@@ -47,6 +46,12 @@ public partial class RunState : Node, IState
             return;
         }
 
+        if (!_owner.IsOnFloor())
+        {
+            _owner.StateMachine.TransitionTo("Fall");
+            return;
+        }
+
         float direction = _owner.GetAxis("left", "right");
         if (Mathf.IsZeroApprox(direction))
         {
@@ -54,8 +59,7 @@ public partial class RunState : Node, IState
             return;
         }
 
-        if (direction < 0) _owner.Sprite.FlipH = true;
-        else if (direction > 0) _owner.Sprite.FlipH = false;
+        _owner.SetFacing(direction < 0 ? -1 : 1);
     }
 
     public void PhysicsUpdate(double delta)
@@ -66,7 +70,7 @@ public partial class RunState : Node, IState
 
         if (!_owner.IsOnFloor())
         {
-            velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+            velocity.Y += Character.Gravity * (float)delta;
         }
 
         _owner.Velocity = velocity;

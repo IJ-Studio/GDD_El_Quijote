@@ -22,6 +22,7 @@ public partial class MainMenu : Control
         _buttonStart1P.Pressed += OnStart1PPressed;
         _buttonStart2P.Pressed += OnStart2PPressed;
         _buttonExit.Pressed += OnExitPressed;
+        _buttonStart1P.GrabFocus();
 
         GD.PrintRich("[color=yellow]MainMenu: Pantalla de inicio cargada[/color]");
     }
@@ -29,14 +30,13 @@ public partial class MainMenu : Control
     private void OnStart1PPressed()
     {
         GD.PrintRich("[color=lime]MainMenu: Iniciando juego en Modo 1 Jugador[/color]");
-        GameManager.Instance.StartGame();
+        GameManager.Instance.StartGame(1);
     }
 
     private void OnStart2PPressed()
     {
         GD.PrintRich("[color=lime]MainMenu: Iniciando juego en Modo 2 Jugadores[/color]");
-        // TODO: Implementar lógica de 2 jugadores en futuro
-        GameManager.Instance.StartGame();
+        GameManager.Instance.StartGame(2);
     }
 
     private void OnExitPressed()

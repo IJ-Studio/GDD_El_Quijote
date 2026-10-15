@@ -6,7 +6,6 @@ using Godot;
 /// </summary>
 public partial class CrouchState : Node, IState
 {
-    private const string ANIM_CROUCH = "crouch";
     private Character _owner = null!;
 
     public CrouchState() { }
@@ -24,8 +23,8 @@ public partial class CrouchState : Node, IState
 
     public void Enter()
     {
-        _owner.Sprite.Play(ANIM_CROUCH);
-        _owner.Velocity = Vector2.Zero;
+        _owner.Sprite.Play("crouch");
+        _owner.Velocity = new Vector2(0, _owner.Velocity.Y);
     }
 
     public void Update(double delta)
@@ -36,6 +35,14 @@ public partial class CrouchState : Node, IState
         }
     }
 
-    public void PhysicsUpdate(double delta) { }
+    public void PhysicsUpdate(double delta)
+    {
+        Vector2 velocity = _owner.Velocity;
+        velocity.X = 0f;
+        if (!_owner.IsOnFloor()) velocity.Y += Character.Gravity * (float)delta;
+        _owner.Velocity = velocity;
+        _owner.MoveAndSlide();
+    }
+
     public void Exit() { }
 }
