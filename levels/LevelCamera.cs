@@ -4,6 +4,7 @@ using Godot;
 /// <summary>
 /// Cámara del nivel: sigue el punto medio entre los jugadores vivos y vibra
 /// cuando FeedbackManager se lo pide (grupo "camara", método Shake).
+/// Con 1 jugador hace más zoom sobre su personaje; con 2 se aleja para que quepan los dos.
 /// </summary>
 public partial class LevelCamera : Camera2D
 {
@@ -11,11 +12,21 @@ public partial class LevelCamera : Camera2D
     [Export] public float Decay { get; set; } = 2.4f;
     [Export] public Vector2 MaxShakeOffset { get; set; } = new(14, 10);
 
+    /// <summary>Zoom con un solo jugador (más cerca del personaje).</summary>
+    [Export] public float SinglePlayerZoom { get; set; } = 1.6f;
+
+    /// <summary>Zoom con dos jugadores (más lejos, para ver a ambos).</summary>
+    [Export] public float CoopZoom { get; set; } = 1.0f;
+
+    /// <summary>Qué tan rápido se acerca o aleja la cámara al cambiar el zoom.</summary>
+    [Export] public float ZoomSpeed { get; set; } = 4f;
+
     private float _trauma = 0f;
 
     public override void _Ready()
     {
         AddToGroup("camara");
+        Zoom = Vector2.One * DesiredZoom();
         GlobalPosition = TargetPosition() ?? GlobalPosition;
         ResetSmoothing();
     }
@@ -26,8 +37,13 @@ public partial class LevelCamera : Camera2D
         _trauma = Mathf.Min(_trauma + amount, 1f);
     }
 
+    private float DesiredZoom() => GameManager.Instance.PlayerCount > 1 ? CoopZoom : SinglePlayerZoom;
+
     public override void _Process(double delta)
     {
+        float zoom = Mathf.Lerp(Zoom.X, DesiredZoom(), 1f - Mathf.Exp(-ZoomSpeed * (float)delta));
+        Zoom = Vector2.One * zoom;
+
         Vector2? target = TargetPosition();
         if (target.HasValue)
         {
