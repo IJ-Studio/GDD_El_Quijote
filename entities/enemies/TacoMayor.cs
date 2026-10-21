@@ -6,16 +6,16 @@ using Godot;
 /// de ataque que transiciona según el porcentaje de vida restante.
 ///
 /// Fases:
-/// - Fase 1 (70-100% HP): embestida pesada
-/// - Fase 2 (30-69% HP): alterna embestida y salsa en arco
-/// - Fase 3 (0-29% HP): ráfaga de salsa y embestidas más rápidas
+/// Su único ataque es lanzar salsa picante en arco (sin embestidas ni golpes cuerpo a cuerpo):
+/// - Fase 1 (70-100% HP): 2 gotas de salsa
+/// - Fase 2 (30-69% HP): 3 gotas, ataca más seguido
+/// - Fase 3 (0-29% HP): ráfaga de 4 gotas, aún más seguido
 /// </summary>
 public partial class TacoMayor : Enemy
 {
     [Export] public float AttackCooldownPhase1 { get; set; } = 2.4f;
     [Export] public float AttackCooldownPhase2 { get; set; } = 1.6f;
     [Export] public float AttackCooldownPhase3 { get; set; } = 0.9f;
-    [Export] public float ChargeSpeedPhase3 { get; set; } = 280f;
 
     /// <summary>El jefe no se aturde ni pierde su ataque por un golpe: mantiene su ritmo por fases.</summary>
     protected override bool ReactsToHits => false;
@@ -31,7 +31,6 @@ public partial class TacoMayor : Enemy
         // Selector: decide el ataque según la fase (polimorfismo de estados)
         StateMachine.RegisterState("EnemyAttack", new PhaseSelectorState(this));
         StateMachine.RegisterState("RangedAttack", new RangedAttackState(this));
-        StateMachine.RegisterState("Charge", new ChargeAttackState(this));
 
         // Estado Alert para Oleada de Adrenalina
         StateMachine.RegisterState("Alert", new GuardState(this, "EnemyAttack"));
@@ -94,7 +93,7 @@ public partial class TacoMayor : Enemy
     public TacoMayorPhase GetCurrentPhase() => _currentPhase;
 
     /// <summary>
-    /// Elige el siguiente ataque según la fase y salta inmediatamente a ese estado.
+    /// Pasa de la guardia al ataque de salsa (el jefe solo tiene este ataque).
     /// </summary>
     private class PhaseSelectorState : IState
     {
@@ -104,13 +103,7 @@ public partial class TacoMayor : Enemy
         public void Enter()
         {
             _boss._attackCount++;
-            string next = _boss._currentPhase switch
-            {
-                TacoMayorPhase.Phase1 => "Charge",
-                TacoMayorPhase.Phase2 => _boss._attackCount % 2 == 0 ? "Charge" : "RangedAttack",
-                _ => _boss._attackCount % 3 == 0 ? "Charge" : "RangedAttack",
-            };
-            _boss.StateMachine.CallDeferred(StateMachine.MethodName.TransitionTo, next);
+            _boss.StateMachine.CallDeferred(StateMachine.MethodName.TransitionTo, "RangedAttack");
         }
 
         public void Update(double delta) { }
@@ -145,7 +138,12 @@ public partial class TacoMayor : Enemy
             {
                 base.Enter();
             }
-            int drops = barrage ? 4 : 2;
+            int drops = _boss._currentPhase switch
+            {
+                TacoMayorPhase.Phase1 => 2,
+                TacoMayorPhase.Phase2 => 3,
+                _ => 4
+            };
             for (int i = 0; i < drops; i++)
             {
                 var projectile = ProjectilePool.Instance.Get(ProjectileType.SalsaPicante);
@@ -170,50 +168,6 @@ public partial class TacoMayor : Enemy
         {
             Owner.StateMachine.TransitionTo("Guard");
         }
-    }
-
-    /// <summary>
-    /// Embestida frontal: corre hacia donde mira hasta chocar o agotar el tiempo.
-    /// </summary>
-    private class ChargeAttackState : EnemyAttackState
-    {
-        private readonly TacoMayor _boss;
-        private const float ChargeAttackDuration = 1.1f;
-
-        public ChargeAttackState(TacoMayor owner) : base(owner, "charge")
-        {
-            _boss = owner;
-        }
-
-        public override void Enter()
-        {
-            base.Enter();
-            _boss.ResetAttackTimer();
-        }
-
-        public override void PhysicsUpdate(double delta)
-        {
-            Vector2 velocity = _boss.Velocity;
-            float speed = _boss._currentPhase == TacoMayorPhase.Phase3 ? _boss.ChargeSpeedPhase3 : _boss.ChargeSpeedPhase3 * 0.75f;
-            velocity.X = _boss.Facing * speed;
-
-            if (!_boss.IsOnFloor())
-            {
-                velocity.Y += Character.Gravity * (float)delta;
-            }
-
-            _boss.Velocity = velocity;
-            _boss.MoveAndSlide();
-
-            // Terminar embestida al chocar con una pared o después de la duración
-            if (_boss.IsOnWall() || _boss.GetTimeSinceAttack() > ChargeAttackDuration)
-            {
-                _boss.StateMachine.TransitionTo("Guard");
-            }
-        }
-
-        // la animación de embestida es en bucle: no termina el ataque por animación
-        protected override void OnAnimationFinished() { }
     }
 
     public enum TacoMayorPhase { Phase1, Phase2, Phase3 }

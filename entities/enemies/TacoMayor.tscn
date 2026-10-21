@@ -163,7 +163,6 @@ BodyHeight = 140.0
 GuardCooldown = 2.0
 PatrolDistance = 0.0
 InvulnerabilityDuration = 0.25
-ChargeSpeedPhase3 = 300.0
 GuardZone = NodePath("GuardZone")
 
 [node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
