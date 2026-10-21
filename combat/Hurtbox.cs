@@ -9,6 +9,9 @@ public partial class Hurtbox : Area2D
     [Export] public NodePath OwnerPath { get; set; } = new NodePath("..");
     private Character? _owner;
 
+    /// <summary>Personaje dueño de esta Hurtbox.</summary>
+    public Character? Fighter => _owner;
+
     public override void _Ready()
     {
         _owner = GetNode<Character>(OwnerPath);

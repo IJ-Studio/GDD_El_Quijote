@@ -27,6 +27,9 @@ public abstract partial class Character : CharacterBody2D
     /// <summary>Punto donde empezó el nivel; ahí reaparece el personaje al perder una vida.</summary>
     public Vector2 SpawnPosition { get; private set; }
 
+    /// <summary>True mientras el personaje está en el estado Crouch (esquiva proyectiles bajos, como el queso).</summary>
+    public bool IsCrouching => StateMachine?.CurrentStateName == "Crouch";
+
     /// <summary>1 = mira a la derecha, -1 = mira a la izquierda.</summary>
     public int Facing { get; private set; } = 1;
 

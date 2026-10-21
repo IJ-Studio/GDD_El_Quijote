@@ -9,6 +9,9 @@ public partial class Hitbox : Area2D
 {
     [Export] public int Damage { get; set; } = 10;
 
+    /// <summary>Si es true, no daña a un personaje que esté agachado (el golpe pasa por encima).</summary>
+    [Export] public bool DodgedByCrouch { get; set; } = false;
+
     public override void _Ready()
     {
         Monitoring = false;   // Inactiva por defecto — la activa AttackState
@@ -19,6 +22,7 @@ public partial class Hitbox : Area2D
     {
         if (area is Hurtbox hurtbox)
         {
+            if (DodgedByCrouch && hurtbox.Fighter is { IsCrouching: true }) return;
             hurtbox.ReceiveDamage(Damage);
         }
     }

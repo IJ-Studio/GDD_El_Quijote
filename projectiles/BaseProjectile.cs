@@ -75,9 +75,11 @@ public abstract partial class BaseProjectile : Area2D
     protected virtual void OnAreaEntered(Area2D area)
     {
         // Si impacta con algo relevante, se devuelve al pool
-        if (area is Hurtbox)
+        if (area is Hurtbox hurtbox)
         {
-             ReturnToPool();
+            // Si el objetivo lo esquiva agachándose, el proyectil sigue de largo
+            if (Hitbox is { DodgedByCrouch: true } && hurtbox.Fighter is { IsCrouching: true }) return;
+            ReturnToPool();
         }
     }
 
