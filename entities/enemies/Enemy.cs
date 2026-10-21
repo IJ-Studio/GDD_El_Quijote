@@ -94,8 +94,19 @@ public abstract partial class Enemy : Character
         SetFacing(target.GlobalPosition.X < GlobalPosition.X ? -1 : 1);
     }
 
-    /// <summary>Punto desde donde salen los proyectiles (frente a la cara).</summary>
-    public Vector2 MuzzlePosition => Center + new Vector2(Facing * BodyHeight * 0.35f, -BodyHeight * 0.1f);
+    /// <summary>
+    /// Punto desde donde salen los proyectiles (frente a la cara). Si hay una estructura entre el
+    /// centro y ese punto (enemigo pegado a una pared), sale del centro para que choque con ella
+    /// en lugar de aparecer al otro lado.
+    /// </summary>
+    public Vector2 MuzzlePosition
+    {
+        get
+        {
+            Vector2 muzzle = Center + new Vector2(Facing * BodyHeight * 0.35f, -BodyHeight * 0.1f);
+            return LineOfSight.IsClear(this, Center, muzzle) ? muzzle : Center;
+        }
+    }
 
     /// <summary>
     /// Respuesta base ante la Oleada de Adrenalina: duplica velocidad y

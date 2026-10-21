@@ -73,6 +73,10 @@ public partial class SalsaPicante : BaseProjectile
         _hasExploded = true;
         EventBus.Instance.EmitProjectileBurst(GlobalPosition, (int)Type);
 
+        // Origen del rayo de línea de vista: un poco atrás del impacto, fuera del sólido
+        Vector2 back = _velocity.LengthSquared() > 0.01f ? -_velocity.Normalized() * 6f : new Vector2(0f, -6f);
+        Vector2 origin = GlobalPosition + back;
+
         // Buscar todas las Hurtbox en el área de explosión
         var space = GetWorld2D().DirectSpaceState;
         var query = new PhysicsShapeQueryParameters2D();
@@ -87,6 +91,11 @@ public partial class SalsaPicante : BaseProjectile
         {
             if (result["collider"].Obj is Hurtbox hurtbox)
             {
+                // La explosión no atraviesa estructuras: si hay una pared o plataforma entre
+                // el punto de impacto y el personaje, no le hace daño.
+                if (hurtbox.Fighter is { } target && !LineOfSight.IsClear(this, origin, target.Center))
+                    continue;
+
                 hurtbox.ReceiveDamage(Enemy.ScaleDamage(AreaDamage));
             }
         }

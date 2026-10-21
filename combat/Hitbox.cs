@@ -23,6 +23,11 @@ public partial class Hitbox : Area2D
         if (area is Hurtbox hurtbox)
         {
             if (DodgedByCrouch && hurtbox.Fighter is { IsCrouching: true }) return;
+
+            // Los golpes cuerpo a cuerpo de un enemigo no atraviesan paredes ni plataformas
+            if (GetParent() is Enemy attacker && hurtbox.Fighter is { } target
+                && !LineOfSight.IsClear(this, attacker.Center, target.Center))
+                return;
             hurtbox.ReceiveDamage(Damage);
         }
     }

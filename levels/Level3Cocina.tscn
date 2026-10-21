@@ -176,6 +176,7 @@ script = ExtResource("20_r")
 EnemyScenes = Array[PackedScene]([ExtResource("21_r"), ExtResource("22_r"), ExtResource("23_r")])
 InitialHorde = 2
 TotalEnemies = 6
+PauseDuringAdrenaline = false
 WaveSize = 2
 WaveInterval = 9.0
 MaxAlive = 5

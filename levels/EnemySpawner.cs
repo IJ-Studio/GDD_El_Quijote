@@ -10,7 +10,8 @@ using Godot;
 /// - Los tipos salen de EnemyScenes y nunca se repite el mismo tipo dos veces seguidas,
 ///   así cada horda (y cada pareja) es variada.
 /// - Aparecen en los Marker2D hijos de este nodo, prefiriendo los más lejanos a los jugadores.
-/// - Se pausa durante una Oleada de Adrenalina para no alterar al grupo disparador del cofre.
+/// - Se pausa durante una Oleada de Adrenalina para no alterar al grupo disparador del cofre
+///   (salvo que PauseDuringAdrenaline sea false, como en el nivel del jefe, donde es permanente).
 /// </summary>
 public partial class EnemySpawner : Node2D
 {
@@ -40,6 +41,9 @@ public partial class EnemySpawner : Node2D
     /// <summary>Segundos que tarda el enemigo en hacerse visible al aparecer.</summary>
     [Export] public float FadeInTime { get; set; } = 0.35f;
 
+    /// <summary>Si es true, no aparecen enemigos mientras dura una Oleada de Adrenalina.</summary>
+    [Export] public bool PauseDuringAdrenaline { get; set; } = true;
+
     private readonly List<Marker2D> _points = new();
     private readonly RandomNumberGenerator _rng = new();
     private float _timer;
@@ -68,7 +72,7 @@ public partial class EnemySpawner : Node2D
 
     public override void _Process(double delta)
     {
-        if (_rushActive || _points.Count == 0 || EnemyScenes.Count == 0 || Remaining <= 0) return;
+        if ((_rushActive && PauseDuringAdrenaline) || _points.Count == 0 || EnemyScenes.Count == 0 || Remaining <= 0) return;
 
         _timer -= (float)delta;
         if (_timer > 0f) return;
