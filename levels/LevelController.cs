@@ -3,7 +3,8 @@ using Godot;
 
 /// <summary>
 /// Orquesta la escena de un nivel (capa NIVEL del GDD): quita a Sancho en modo
-/// de 1 jugador, registra a los jugadores y lanza los diálogos del nivel.
+/// de 1 jugador (y a quien ya no tenga vidas), registra a los jugadores y lanza
+/// los diálogos del nivel.
 /// No contiene lógica de combate.
 /// </summary>
 public partial class LevelController : Node2D
@@ -18,16 +19,20 @@ public partial class LevelController : Node2D
 
     public override void _Ready()
     {
-        var sancho = GetNodeOrNull<Node>("SanchoPanza");
-        if (sancho != null && GameManager.Instance.PlayerCount < 2)
+        string[] playerNames = { "DonQuijote", "SanchoPanza" };
+        for (int i = 0; i < playerNames.Length; i++)
         {
-            sancho.QueueFree();
-        }
+            var player = GetNodeOrNull<Node>(playerNames[i]);
+            if (player == null) continue;
 
-        foreach (string name in new[] { "DonQuijote", "SanchoPanza" })
-        {
-            var player = GetNodeOrNull<Node>(name);
-            if (player != null && !player.IsQueuedForDeletion()) player.AddToGroup("players");
+            // Sancho solo juega en modo de 2 jugadores; quien se quedó sin vidas no vuelve a entrar
+            bool absent = (i == 1 && GameManager.Instance.PlayerCount < 2) || GameManager.Instance.GetLives(i) <= 0;
+            if (absent)
+            {
+                player.QueueFree();
+                continue;
+            }
+            player.AddToGroup("players");
         }
 
         EventBus.Instance.CureObtained += OnCureObtained;

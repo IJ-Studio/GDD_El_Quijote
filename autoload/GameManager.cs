@@ -3,25 +3,37 @@ using System.Collections.Generic;
 using Godot;
 
 /// <summary>
-/// Singleton global: vidas, llave, Cura, nivel activo y flujo de pantallas.
+/// Singleton global: vidas por personaje, llave, Cura, nivel activo y flujo de pantallas.
 /// Registrado como Autoload "GameManager" en project.godot.
+///
+/// Cuando un personaje muere NO se recarga el nivel: pierde una de SUS vidas y reaparece
+/// en su punto de inicio, así los enemigos derrotados siguen derrotados. El otro personaje
+/// no se ve afectado. La partida termina cuando todos los jugadores se quedan sin vidas.
 /// </summary>
 public partial class GameManager : Node
 {
     public static GameManager Instance { get; private set; } = null!;
 
+    private const int StartingLives = 5;
+
     // ── Estado persistente entre escenas ──────────────────────────
-    public int  Lives        { get; private set; } = 5;
+    private readonly int[] _lives = { StartingLives, StartingLives };
+
+    /// <summary>Vidas restantes sumadas de los jugadores en partida.</summary>
+    public int  Lives        => GetLives(0) + (PlayerCount > 1 ? GetLives(1) : 0);
     public int  CurrentLives => Lives;
     public bool HasKey       { get; set; } = false;
     public bool HasCure      { get; set; } = false;
     public int  CurrentLevel { get; private set; } = 1;
     public int  PlayerCount  { get; private set; } = 1;
 
-    /// <summary>Segundos entre la muerte del jugador y el reinicio del nivel (deja ver la animación).</summary>
+    /// <summary>Enemigos derrotados en la partida. Se conserva al reaparecer y entre niveles.</summary>
+    public int EnemiesDefeated { get; private set; } = 0;
+
+    /// <summary>Segundos entre la muerte del jugador y su reaparición (deja ver la animación).</summary>
     [Export] public float RespawnDelay { get; set; } = 1.6f;
 
-    private bool _respawnPending = false;
+    private readonly HashSet<Character> _respawning = new();
 
     /// <summary>Diálogos ya vistos en esta partida (no se repiten al reintentar un nivel).</summary>
     public HashSet<string> SeenDialogues { get; } = new();
@@ -34,8 +46,15 @@ public partial class GameManager : Node
         EventBus.Instance.KeyCollected   += OnKeyCollected;
         EventBus.Instance.CureCollected  += OnCureCollected;
         EventBus.Instance.PlayerDied     += OnPlayerDied;
+        EventBus.Instance.EnemyKilled    += OnEnemyKilled;
         EventBus.Instance.LevelCompleted += OnLevelCompleted;
     }
+
+    /// <summary>0 = Don Quijote, 1 = Sancho Panza.</summary>
+    public static int PlayerIndexOf(Character character) => character is SanchoPanza ? 1 : 0;
+
+    /// <summary>Vidas restantes del jugador indicado (0 = Quijote, 1 = Sancho).</summary>
+    public int GetLives(int playerIndex) => _lives[Mathf.Clamp(playerIndex, 0, 1)];
 
     public void StartGame() => StartGame(1);
 
@@ -43,9 +62,11 @@ public partial class GameManager : Node
     public void StartGame(int players)
     {
         PlayerCount = Mathf.Clamp(players, 1, 2);
-        _respawnPending = false;
+        _respawning.Clear();
         SeenDialogues.Clear();
-        Lives = 5;
+        _lives[0] = StartingLives;
+        _lives[1] = StartingLives;
+        EnemiesDefeated = 0;
         HasKey = false;
         HasCure = false;
         CurrentLevel = 1;
@@ -76,40 +97,68 @@ public partial class GameManager : Node
         GD.PrintRich("[color=lime]GameManager: Juego reanudado[/color]");
     }
 
-    /// <summary>
-    /// Pierde una vida. Transiciona a GameOver si llega a 0, o recarga la escena actual.
-    /// </summary>
-    public void LoseLife()
+    /// <summary>Resta una vida al jugador indicado (0 = Quijote, 1 = Sancho) y avisa al HUD.</summary>
+    public void LoseLife(int playerIndex = 0)
     {
-        Lives = Mathf.Max(0, Lives - 1);
-        if (Lives <= 0)
-        {
-            TransitionState(GameState.GameOver);
-            GetTree().ChangeSceneToFile("res://ui/GameOverScreen.tscn");
-        }
-        else
-        {
-            GetTree().ReloadCurrentScene();
-        }
+        int index = Mathf.Clamp(playerIndex, 0, 1);
+        _lives[index] = Mathf.Max(0, _lives[index] - 1);
+        EventBus.Instance.EmitLivesChanged(index, _lives[index]);
     }
 
-    private void OnPlayerDied(Character _)
+    private void OnPlayerDied(Character player)
     {
-        // Espera a que se vea la animación de derrota antes de reiniciar
-        if (_respawnPending) return;
-        _respawnPending = true;
-        GetTree().CreateTimer(RespawnDelay).Timeout += () =>
+        // Una sola gestión por muerte (la señal podría repetirse)
+        if (!_respawning.Add(player)) return;
+
+        LoseLife(PlayerIndexOf(player));
+
+        // Espera a que se vea la animación de derrota antes de reaparecer / terminar
+        GetTree().CreateTimer(RespawnDelay).Timeout += () => FinishDeath(player);
+    }
+
+    private void FinishDeath(Character player)
+    {
+        _respawning.Remove(player);
+        if (State == GameState.GameOver || State == GameState.Victory) return;
+
+        if (AllPlayersOutOfLives())
         {
-            _respawnPending = false;
-            LoseLife();
-        };
+            GameOver();
+            return;
+        }
+
+        // Reaparece solo si aún le quedan vidas; los enemigos y objetos del nivel no se tocan
+        if (GodotObject.IsInstanceValid(player) && player.IsInsideTree() && GetLives(PlayerIndexOf(player)) > 0)
+            player.Respawn();
+    }
+
+    private bool AllPlayersOutOfLives()
+    {
+        for (int i = 0; i < PlayerCount; i++)
+        {
+            if (GetLives(i) > 0) return false;
+        }
+        return true;
+    }
+
+    private void GameOver()
+    {
+        TransitionState(GameState.GameOver);
+        GetTree().ChangeSceneToFile("res://ui/GameOverScreen.tscn");
     }
 
     private void OnKeyCollected()          => HasKey  = true;
     private void OnCureCollected()         => HasCure = true;
 
+    private void OnEnemyKilled(Enemy _)
+    {
+        EnemiesDefeated++;
+        EventBus.Instance.EmitEnemiesDefeatedChanged(EnemiesDefeated);
+    }
+
     private void OnLevelCompleted(int lvl)
     {
+        _respawning.Clear();
         CurrentLevel = lvl + 1;
         if (CurrentLevel > 3)
         {
@@ -143,6 +192,7 @@ public partial class GameManager : Node
         EventBus.Instance.KeyCollected   -= OnKeyCollected;
         EventBus.Instance.CureCollected  -= OnCureCollected;
         EventBus.Instance.PlayerDied     -= OnPlayerDied;
+        EventBus.Instance.EnemyKilled    -= OnEnemyKilled;
         EventBus.Instance.LevelCompleted -= OnLevelCompleted;
     }
 }

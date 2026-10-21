@@ -11,6 +11,8 @@ public partial class EventBus : Node
     // ── Señales de vida ────────────────────────────────────────────
     [Signal] public delegate void HealthChangedEventHandler(Character character, int current, int max);
     [Signal] public delegate void PlayerDiedEventHandler(Character player);
+    /// <summary>Las vidas restantes de un jugador cambiaron (0 = Quijote, 1 = Sancho).</summary>
+    [Signal] public delegate void LivesChangedEventHandler(int playerIndex, int lives);
 
     // ── Señales de coleccionables ──────────────────────────────────
     [Signal] public delegate void KeyCollectedEventHandler();
@@ -28,6 +30,7 @@ public partial class EventBus : Node
     // ── Señales de nivel ──────────────────────────────────────────
     [Signal] public delegate void LevelCompletedEventHandler(int levelNumber);
     [Signal] public delegate void EnemyKilledEventHandler(Enemy enemy);
+    [Signal] public delegate void EnemiesDefeatedChangedEventHandler(int total);
 
     // ── Señales de combate (retroalimentación visual / sonora) ────
     [Signal] public delegate void DamageDealtEventHandler(Character target, int amount);
@@ -53,6 +56,8 @@ public partial class EventBus : Node
     public void EmitLevelCompleted(int n)  => EmitSignal(SignalName.LevelCompleted, n);
     public void EmitEnemyKilled(Enemy e)   => EmitSignal(SignalName.EnemyKilled, e);
     public void EmitPlayerDied(Character p) => EmitSignal(SignalName.PlayerDied, p);
+    public void EmitLivesChanged(int playerIndex, int lives) => EmitSignal(SignalName.LivesChanged, playerIndex, lives);
+    public void EmitEnemiesDefeatedChanged(int total) => EmitSignal(SignalName.EnemiesDefeatedChanged, total);
     public void EmitDamageDealt(Character t, int amount) => EmitSignal(SignalName.DamageDealt, t, amount);
     public void EmitAttackBlocked(Character t) => EmitSignal(SignalName.AttackBlocked, t);
     public void EmitProjectileBurst(Vector2 pos, int type) => EmitSignal(SignalName.ProjectileBurst, pos, type);

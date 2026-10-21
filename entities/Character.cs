@@ -24,6 +24,9 @@ public abstract partial class Character : CharacterBody2D
     public bool IsInvulnerable { get; protected set; } = false;
     private float _invulnerabilityTimer = 0f;
 
+    /// <summary>Punto donde empezó el nivel; ahí reaparece el personaje al perder una vida.</summary>
+    public Vector2 SpawnPosition { get; private set; }
+
     /// <summary>1 = mira a la derecha, -1 = mira a la izquierda.</summary>
     public int Facing { get; private set; } = 1;
 
@@ -43,6 +46,7 @@ public abstract partial class Character : CharacterBody2D
     public override void _Ready()
     {
         CurrentHealth = MaxHealth;
+        SpawnPosition = GlobalPosition;
         StateMachine  = GetNode<StateMachine>("StateMachine");
         Sprite        = GetNode<AnimatedSprite2D>("AnimatedSprite2D");
 
@@ -187,6 +191,26 @@ public abstract partial class Character : CharacterBody2D
         if (CurrentHealth <= 0) return;
         CurrentHealth = Mathf.Min(MaxHealth, CurrentHealth + amount);
         EventBus.Instance.EmitHealthChanged(this, CurrentHealth, MaxHealth);
+    }
+
+    /// <summary>
+    /// Reaparece al personaje en su punto de inicio con la vida completa y unos segundos de
+    /// invulnerabilidad. NO recarga el nivel: enemigos, objetos y progreso se conservan.
+    /// </summary>
+    public virtual void Respawn(float invulnerableSeconds = 2f)
+    {
+        CurrentHealth = MaxHealth;
+        GlobalPosition = SpawnPosition;
+        Velocity = Vector2.Zero;
+
+        Hurtbox?.SetDeferred(Area2D.PropertyName.Monitorable, true);
+        Hitbox?.SetDeferred(Area2D.PropertyName.Monitoring, false);
+
+        IsInvulnerable = true;
+        _invulnerabilityTimer = invulnerableSeconds;
+
+        EventBus.Instance.EmitHealthChanged(this, CurrentHealth, MaxHealth);
+        StateMachine.TransitionTo("Idle");
     }
 
     protected virtual void Die()

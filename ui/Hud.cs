@@ -13,6 +13,7 @@ public partial class Hud : CanvasLayer
     [Export] private Control?       _panelP2;
     [Export] private HBoxContainer? _hearts;
     [Export] private Label?         _livesLabel;
+    [Export] private Label?         _killsLabel;
     [Export] private TextureRect?   _keyIcon;
     [Export] private TextureRect?   _cureIcon;
     [Export] private Control?       _adrenalineBanner;
@@ -29,9 +30,10 @@ public partial class Hud : CanvasLayer
         EventBus.Instance.HealthChanged     += OnHealthChanged;
         EventBus.Instance.KeyCollected      += OnKeyCollected;
         EventBus.Instance.CureCollected     += OnCureCollected;
-        EventBus.Instance.PlayerDied        += OnPlayerDied;
-        EventBus.Instance.AdrenalineStarted += OnAdrenalineStarted;
-        EventBus.Instance.AdrenalineEnded   += OnAdrenalineEnded;
+        EventBus.Instance.LivesChanged           += OnLivesChanged;
+        EventBus.Instance.EnemiesDefeatedChanged += OnEnemiesDefeatedChanged;
+        EventBus.Instance.AdrenalineStarted      += OnAdrenalineStarted;
+        EventBus.Instance.AdrenalineEnded        += OnAdrenalineEnded;
 
         // Instanciar PauseMenu como child de este HUD
         var pauseMenuScene = GD.Load<PackedScene>("res://ui/PauseMenu.tscn");
@@ -44,7 +46,8 @@ public partial class Hud : CanvasLayer
         if (_adrenalineBanner is not null) _adrenalineBanner.Visible = false;
         if (_adrenalineFrame is not null)  _adrenalineFrame.Visible = false;
         if (_bossPanel is not null)  _bossPanel.Visible = false;
-        UpdateLivesDisplay();
+        UpdateLivesDisplay(GameManager.Instance.GetLives(0));
+        OnEnemiesDefeatedChanged(GameManager.Instance.EnemiesDefeated);
     }
 
     private void OnHealthChanged(Character c, int current, int max)
@@ -65,7 +68,15 @@ public partial class Hud : CanvasLayer
         }
     }
 
-    private void OnPlayerDied(Character _) => UpdateLivesDisplay(GameManager.Instance.Lives - 1);
+    private void OnLivesChanged(int playerIndex, int lives)
+    {
+        if (playerIndex == 0) UpdateLivesDisplay(lives);
+    }
+
+    private void OnEnemiesDefeatedChanged(int total)
+    {
+        if (_killsLabel is not null) _killsLabel.Text = $"DERROTADOS: {total}";
+    }
 
     private void OnKeyCollected()
     {
@@ -100,9 +111,9 @@ public partial class Hud : CanvasLayer
     }
 
     /// <summary>Dibuja un corazón lleno por cada vida.</summary>
-    private void UpdateLivesDisplay(int? livesOverride = null)
+    private void UpdateLivesDisplay(int livesRemaining)
     {
-        int lives = Mathf.Max(0, livesOverride ?? GameManager.Instance.Lives);
+        int lives = Mathf.Max(0, livesRemaining);
         if (_livesLabel is not null) _livesLabel.Text = $"x{lives}";
         if (_hearts is null) return;
         for (int i = 0; i < _hearts.GetChildCount(); i++)
@@ -126,8 +137,9 @@ public partial class Hud : CanvasLayer
         EventBus.Instance.HealthChanged     -= OnHealthChanged;
         EventBus.Instance.KeyCollected      -= OnKeyCollected;
         EventBus.Instance.CureCollected     -= OnCureCollected;
-        EventBus.Instance.PlayerDied        -= OnPlayerDied;
-        EventBus.Instance.AdrenalineStarted -= OnAdrenalineStarted;
-        EventBus.Instance.AdrenalineEnded   -= OnAdrenalineEnded;
+        EventBus.Instance.LivesChanged           -= OnLivesChanged;
+        EventBus.Instance.EnemiesDefeatedChanged -= OnEnemiesDefeatedChanged;
+        EventBus.Instance.AdrenalineStarted      -= OnAdrenalineStarted;
+        EventBus.Instance.AdrenalineEnded        -= OnAdrenalineEnded;
     }
 }

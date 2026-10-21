@@ -32,7 +32,7 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0, 0, 0, 1)
 
-[node name="Hud" type="CanvasLayer" node_paths=PackedStringArray("_healthBar", "_healthBarP2", "_panelP2", "_hearts", "_livesLabel", "_keyIcon", "_cureIcon", "_adrenalineBanner", "_adrenalineFrame", "_bossPanel", "_bossBar")]
+[node name="Hud" type="CanvasLayer" node_paths=PackedStringArray("_healthBar", "_healthBarP2", "_panelP2", "_hearts", "_livesLabel", "_killsLabel", "_keyIcon", "_cureIcon", "_adrenalineBanner", "_adrenalineFrame", "_bossPanel", "_bossBar")]
 layer = 10
 script = ExtResource("3_r")
 _healthBar = NodePath("Root/PanelP1/VBox/Fila/HealthBar")
@@ -40,6 +40,7 @@ _healthBarP2 = NodePath("Root/PanelP2/Fila/HealthBar")
 _panelP2 = NodePath("Root/PanelP2")
 _hearts = NodePath("Root/PanelP1/VBox/Vidas/Hearts")
 _livesLabel = NodePath("Root/PanelP1/VBox/Vidas/LivesLabel")
+_killsLabel = NodePath("Root/KillsLabel")
 _keyIcon = NodePath("Root/Objetos/KeyIcon")
 _cureIcon = NodePath("Root/Objetos/CureIcon")
 _adrenalineBanner = NodePath("Root/AdrenalineBanner")
@@ -170,6 +171,22 @@ size_flags_vertical = 4
 theme_override_styles/fill = SubResource("StyleBoxFlat_2")
 value = 100.0
 show_percentage = false
+
+[node name="KillsLabel" type="Label" parent="Root"]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -160.0
+offset_top = 14.0
+offset_right = 160.0
+offset_bottom = 34.0
+grow_horizontal = 2
+text = "DERROTADOS: 0"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 10
+theme_override_colors/font_color = Color(1, 1, 1, 1)
+theme_override_constants/outline_size = 6
 
 [node name="Objetos" type="HBoxContainer" parent="Root"]
 layout_mode = 1
