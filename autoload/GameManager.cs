@@ -43,6 +43,7 @@ public partial class GameManager : Node
     public override void _Ready()
     {
         Instance = this;
+        ControlBindings.LoadAndApply(); // aplica las teclas elegidas en el menú de controles
         EventBus.Instance.KeyCollected   += OnKeyCollected;
         EventBus.Instance.CureCollected  += OnCureCollected;
         EventBus.Instance.PlayerDied     += OnPlayerDied;

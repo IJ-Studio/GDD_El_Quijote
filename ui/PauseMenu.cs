@@ -8,15 +8,18 @@ using Godot;
 public partial class PauseMenu : Control
 {
     private Button? _buttonResume;
+    private Button? _buttonControls;
     private Button? _buttonMainMenu;
     private bool _isPauseMenuVisible = false;
 
     public override void _Ready()
     {
         _buttonResume = GetNode<Button>("VBoxContainer/ButtonResume");
+        _buttonControls = GetNode<Button>("VBoxContainer/ButtonControls");
         _buttonMainMenu = GetNode<Button>("VBoxContainer/ButtonMainMenu");
 
         _buttonResume.Pressed += OnResumePressed;
+        _buttonControls.Pressed += OnControlsPressed;
         _buttonMainMenu.Pressed += OnMainMenuPressed;
 
         // Inicialmente oculto; debe seguir recibiendo input con el juego en pausa
@@ -63,6 +66,13 @@ public partial class PauseMenu : Control
         GD.PrintRich("[color=lime]PauseMenu: Reanudando juego[/color]");
     }
 
+    private void OnControlsPressed()
+    {
+        var menu = GD.Load<PackedScene>("res://ui/ControlsMenu.tscn").Instantiate<ControlsMenu>();
+        menu.Closed += () => _buttonControls?.GrabFocus();
+        AddChild(menu);
+    }
+
     private void OnMainMenuPressed()
     {
         GetTree().Paused = false;
@@ -73,6 +83,7 @@ public partial class PauseMenu : Control
     public override void _ExitTree()
     {
         if (_buttonResume is not null)    _buttonResume.Pressed -= OnResumePressed;
+        if (_buttonControls is not null)  _buttonControls.Pressed -= OnControlsPressed;
         if (_buttonMainMenu is not null)  _buttonMainMenu.Pressed -= OnMainMenuPressed;
     }
 }
