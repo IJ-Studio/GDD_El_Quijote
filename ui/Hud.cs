@@ -27,6 +27,10 @@ public partial class Hud : CanvasLayer
 
     private Tween? _adrenalineTween;
 
+    private static readonly Color BlockedLossColor = new(0.3f, 0.6f, 1f);
+    private float _lastPercentP1 = 100f;
+    private float _lastPercentP2 = 100f;
+
     public override void _Ready()
     {
         EventBus.Instance.HealthChanged     += OnHealthChanged;
@@ -59,9 +63,13 @@ public partial class Hud : CanvasLayer
         switch (c)
         {
             case DonQuijote when _healthBar is not null:
+                ShowLostChunk(_healthBar, _lastPercentP1, percent, c.LastDamageWasBlocked);
+                _lastPercentP1 = percent;
                 _healthBar.Value = percent;
                 break;
             case SanchoPanza when _healthBarP2 is not null:
+                ShowLostChunk(_healthBarP2, _lastPercentP2, percent, c.LastDamageWasBlocked);
+                _lastPercentP2 = percent;
                 _healthBarP2.Value = percent;
                 break;
             case TacoMayor when _bossBar is not null && _bossPanel is not null:
@@ -69,6 +77,28 @@ public partial class Hud : CanvasLayer
                 _bossBar.Value = percent;
                 break;
         }
+    }
+
+    /// <summary>
+    /// Marca en la barra el trozo de vida que se acaba de perder y lo desvanece.
+    /// Si el golpe llegó con el escudo arriba, el trozo es azul.
+    /// </summary>
+    private void ShowLostChunk(ProgressBar bar, float previous, float current, bool blocked)
+    {
+        if (!blocked || current >= previous) return;
+        float width = bar.Size.X;
+        var chunk = new ColorRect
+        {
+            Color = BlockedLossColor,
+            MouseFilter = Control.MouseFilterEnum.Ignore,
+            Position = new Vector2(width * current / 100f, 0f),
+            Size = new Vector2(width * (previous - current) / 100f, bar.Size.Y)
+        };
+        bar.AddChild(chunk);
+        var tween = chunk.CreateTween();
+        tween.TweenInterval(0.35);
+        tween.TweenProperty(chunk, "modulate:a", 0f, 0.6f);
+        tween.TweenCallback(Callable.From(chunk.QueueFree));
     }
 
     private void OnLivesChanged(int playerIndex, int lives)

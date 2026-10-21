@@ -77,8 +77,16 @@ public partial class BlockState : Node, IState
         IsHighBlock = false;
     }
 
+    /// <summary>Fracción del daño que atraviesa el escudo en bloqueo normal.</summary>
+    private const float BlockedDamageFraction = 0.2f;
+
+    /// <summary>
+    /// Con el escudo el daño es mínimo: el bloqueo alto lo anula y el normal deja pasar
+    /// solo una fracción (siempre al menos 1 para que se note el impacto).
+    /// </summary>
     public int ModifyDamage(int incomingDamage)
     {
-        return IsHighBlock ? 0 : incomingDamage / 2;
+        if (IsHighBlock) return 0;
+        return Mathf.Max(1, Mathf.RoundToInt(incomingDamage * BlockedDamageFraction));
     }
 }

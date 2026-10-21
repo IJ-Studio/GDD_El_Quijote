@@ -15,6 +15,7 @@ public partial class FeedbackManager : Node
     private const string SparkFolder = "res://assets/sprites/objetos/";
 
     private static readonly Color PlayerHitColor = new(0.95f, 0.25f, 0.2f);
+    private static readonly Color BlockedDamageColor = new(0.3f, 0.6f, 1f);
     private static readonly Color EnemyHitColor  = new(1f, 0.72f, 0.25f);
     private static readonly Color SauceColor     = new(0.85f, 0.12f, 0.08f);
 
@@ -47,7 +48,7 @@ public partial class FeedbackManager : Node
         Flash(target);
         Burst(target.Center, isPlayer ? PlayerHitColor : EnemyHitColor, killed ? 26 : 10, killed ? 1.4f : 0.8f);
         FloatingText(target.Center + new Vector2(0, -target.BodyHeight * 0.55f), $"-{amount}",
-            isPlayer ? PlayerHitColor : Colors.White, 10);
+            !isPlayer ? Colors.White : target.LastDamageWasBlocked ? BlockedDamageColor : PlayerHitColor, 10);
 
         if (isPlayer)
         {

@@ -22,6 +22,9 @@ public abstract partial class Character : CharacterBody2D
     // ── Estado en tiempo de ejecución ─────────────────────────────
     public int CurrentHealth { get; protected set; }
     public bool IsInvulnerable { get; protected set; } = false;
+
+    /// <summary>True si el último golpe recibido llegó con el escudo arriba (daño reducido).</summary>
+    public bool LastDamageWasBlocked { get; private set; } = false;
     private float _invulnerabilityTimer = 0f;
 
     /// <summary>Punto donde empezó el nivel; ahí reaparece el personaje al perder una vida.</summary>
@@ -161,6 +164,8 @@ public abstract partial class Character : CharacterBody2D
         if (IsInvulnerable || CurrentHealth <= 0) return;
 
         int finalDamage = ModifyIncomingDamage(amount);
+        bool blocked = StateMachine.CurrentStateName == "Block";
+        LastDamageWasBlocked = blocked;
         if (finalDamage < amount)
         {
             EventBus.Instance.EmitAttackBlocked(this);
@@ -176,8 +181,8 @@ public abstract partial class Character : CharacterBody2D
 
         if (CurrentHealth <= 0)
             Die();
-        else
-            StateMachine.TransitionTo("Hurt");
+        else if (!blocked)
+            StateMachine.TransitionTo("Hurt"); // con el escudo arriba no se interrumpe la guardia
     }
 
     /// <summary>
