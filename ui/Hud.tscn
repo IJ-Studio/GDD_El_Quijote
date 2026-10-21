@@ -1,10 +1,11 @@
-[gd_scene load_steps=11 format=3]
+[gd_scene load_steps=12 format=3]
 
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/corazon_lleno.png" id="1_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/corazon_vacio.png" id="2_r"]
 [ext_resource type="Script" path="res://ui/Hud.cs" id="3_r"]
 [ext_resource type="Theme" path="res://ui/tema.tres" id="4_r"]
-[ext_resource type="Texture2D" path="res://assets/sprites/ui/vineta_roja.png" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/vineta_amarilla.png" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/ui/vineta_roja.png" id="8_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/llave_icono.png" id="6_r"]
 [ext_resource type="Texture2D" path="res://assets/sprites/ui/cura_icono.png" id="7_r"]
 
@@ -32,7 +33,7 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0, 0, 0, 1)
 
-[node name="Hud" type="CanvasLayer" node_paths=PackedStringArray("_healthBar", "_healthBarP2", "_panelP2", "_hearts", "_livesLabel", "_heartsP2", "_livesLabelP2", "_killsLabel", "_keyIcon", "_cureIcon", "_adrenalineBanner", "_adrenalineFrame", "_bossPanel", "_bossBar")]
+[node name="Hud" type="CanvasLayer" node_paths=PackedStringArray("_healthBar", "_healthBarP2", "_panelP2", "_hearts", "_livesLabel", "_heartsP2", "_livesLabelP2", "_killsLabel", "_keyIcon", "_cureIcon", "_adrenalineBanner", "_adrenalineFrame", "_damageFrame", "_bossPanel", "_bossBar")]
 layer = 10
 script = ExtResource("3_r")
 _healthBar = NodePath("Root/PanelP1/VBox/Fila/HealthBar")
@@ -47,6 +48,7 @@ _keyIcon = NodePath("Root/Objetos/KeyIcon")
 _cureIcon = NodePath("Root/Objetos/CureIcon")
 _adrenalineBanner = NodePath("Root/AdrenalineBanner")
 _adrenalineFrame = NodePath("Root/AdrenalineFrame")
+_damageFrame = NodePath("Root/DamageFrame")
 _bossPanel = NodePath("Root/BossPanel")
 _bossBar = NodePath("Root/BossPanel/BossBar")
 _heartFull = ExtResource("1_r")
@@ -71,6 +73,19 @@ grow_horizontal = 2
 grow_vertical = 2
 mouse_filter = 2
 texture = ExtResource("5_r")
+expand_mode = 1
+stretch_mode = 0
+
+[node name="DamageFrame" type="TextureRect" parent="Root"]
+visible = false
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+texture = ExtResource("8_r")
 expand_mode = 1
 stretch_mode = 0
 
@@ -271,7 +286,7 @@ grow_horizontal = 2
 text = "¡OLEADA DE ADRENALINA!"
 horizontal_alignment = 1
 theme_override_font_sizes/font_size = 20
-theme_override_colors/font_color = Color(1, 0.3, 0.2, 1)
+theme_override_colors/font_color = Color(1, 0.85, 0.1, 1)
 theme_override_constants/outline_size = 8
 
 [node name="BossPanel" type="VBoxContainer" parent="Root"]
