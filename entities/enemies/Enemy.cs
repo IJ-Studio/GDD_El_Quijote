@@ -8,6 +8,24 @@ using Godot;
 /// </summary>
 public abstract partial class Enemy : Character
 {
+    /// <summary>Grupo al que pertenecen todos los enemigos (lo usa el EnemySpawner para contarlos).</summary>
+    public const string GroupName = "enemies";
+
+    /// <summary>
+    /// Ajuste global de balance: multiplica el tiempo de espera entre ataques de TODOS los enemigos
+    /// (1.6 = atacan con un 60 % más de pausa, es decir, más lento).
+    /// </summary>
+    public static float AttackCooldownScale { get; set; } = 1.6f;
+
+    /// <summary>
+    /// Ajuste global de balance: multiplica el daño por ataque de TODOS los enemigos
+    /// (cuerpo a cuerpo, proyectiles y explosiones). 0.6 = hacen un 40 % menos de daño.
+    /// </summary>
+    public static float DamageScale { get; set; } = 0.6f;
+
+    /// <summary>Aplica <see cref="DamageScale"/> a un daño base; nunca baja de 1.</summary>
+    public static int ScaleDamage(int baseDamage) => Mathf.Max(1, Mathf.RoundToInt(baseDamage * DamageScale));
+
     [Export] public Area2D? GuardZone { get; private set; }
 
     /// <summary>Segundos que espera en guardia entre un ataque y el siguiente.</summary>
@@ -23,6 +41,13 @@ public abstract partial class Enemy : Character
     public override void _Ready()
     {
         base._Ready();
+        AddToGroup(GroupName);
+
+        // Balance: todos los enemigos atacan más despacio y hacen menos daño por golpe
+        GuardCooldown *= AttackCooldownScale;
+        if (Hitbox is not null)
+            Hitbox.Damage = ScaleDamage(Hitbox.Damage);
+
         PatrolOriginX = GlobalPosition.X;
         SetFacing(-1);
         CooldownLeft = GuardCooldown * 0.5f;

@@ -1,4 +1,4 @@
-[gd_scene load_steps=30 format=3]
+[gd_scene load_steps=31 format=3]
 
 [ext_resource type="Script" path="res://levels/LevelController.cs" id="1_r"]
 [ext_resource type="Texture2D" path="res://assets/backgrounds/almacen.png" id="2_r"]
@@ -17,6 +17,7 @@
 [ext_resource type="Script" path="res://levels/LevelCamera.cs" id="15_r"]
 [ext_resource type="PackedScene" path="res://ui/Hud.tscn" id="16_r"]
 [ext_resource type="PackedScene" path="res://ui/DialogueBox.tscn" id="17_r"]
+[ext_resource type="Script" path="res://levels/EnemySpawner.cs" id="18_r"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(1511.89, 80.0)
@@ -206,6 +207,26 @@ position = Vector2(999.288, 566.263)
 [node name="Pizza2" parent="." instance=ExtResource("11_r")]
 position = Vector2(830.178, 390.747)
 PatrolDistance = 0.0
+
+[node name="EnemySpawner" type="Node2D" parent="."]
+script = ExtResource("18_r")
+EnemyScenes = Array[PackedScene]([ExtResource("11_r"), ExtResource("12_r")])
+InitialHorde = 3
+WaveSize = 2
+WaveInterval = 7.0
+MaxAlive = 8
+
+[node name="Spawn1" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(1180.0, 566.263)
+
+[node name="Spawn2" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(930.0, 566.263)
+
+[node name="Spawn3" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(680.0, 566.263)
+
+[node name="Spawn4" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(360.0, 566.263)
 
 [node name="DonQuijote" parent="." instance=ExtResource("13_r")]
 position = Vector2(90.0, 566.263)

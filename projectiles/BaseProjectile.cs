@@ -23,7 +23,7 @@ public abstract partial class BaseProjectile : Area2D
         Hitbox = GetNodeOrNull<Hitbox>("Hitbox");
         if (Hitbox != null)
         {
-            Hitbox.Damage = Damage;
+            Hitbox.Damage = Enemy.ScaleDamage(Damage);
         }
         
         // Conectar señal de impacto si es necesario, o dejar que la Hitbox lo maneje

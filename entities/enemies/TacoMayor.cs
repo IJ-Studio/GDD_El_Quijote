@@ -74,13 +74,17 @@ public partial class TacoMayor : Enemy
         return TacoMayorPhase.Phase3;
     }
 
-    public float GetCurrentAttackCooldown() => _currentPhase switch
+    public float GetCurrentAttackCooldown()
     {
-        TacoMayorPhase.Phase1 => AttackCooldownPhase1,
-        TacoMayorPhase.Phase2 => AttackCooldownPhase2,
-        TacoMayorPhase.Phase3 => AttackCooldownPhase3,
-        _ => 2.0f
-    };
+        float baseCooldown = _currentPhase switch
+        {
+            TacoMayorPhase.Phase1 => AttackCooldownPhase1,
+            TacoMayorPhase.Phase2 => AttackCooldownPhase2,
+            TacoMayorPhase.Phase3 => AttackCooldownPhase3,
+            _ => 2.0f
+        };
+        return baseCooldown * AttackCooldownScale;
+    }
 
     public float GetTimeSinceAttack() => _timeSinceAttack;
     public void ResetAttackTimer() => _timeSinceAttack = 0f;

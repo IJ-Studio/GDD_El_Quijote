@@ -87,7 +87,7 @@ public partial class SalsaPicante : BaseProjectile
         {
             if (result["collider"].Obj is Hurtbox hurtbox)
             {
-                hurtbox.ReceiveDamage(AreaDamage);
+                hurtbox.ReceiveDamage(Enemy.ScaleDamage(AreaDamage));
             }
         }
     }
