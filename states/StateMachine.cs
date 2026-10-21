@@ -5,7 +5,7 @@ using Godot;
 
 /// <summary>
 /// Motor genérico de la FSM. Se registra como hijo del nodo Character en la escena.
-/// Los estados se registran por código en Character._Ready() → InitializeStates().
+/// Los estados se registran por código o se descubren automáticamente como nodos hijos.
 /// </summary>
 public partial class StateMachine : Node
 {
@@ -13,6 +13,18 @@ public partial class StateMachine : Node
     private Dictionary<string, IState>  _states = new();
 
     [Export] public string InitialState { get; set; } = "Idle";
+
+    public override void _Ready()
+    {
+        // Auto-registrar nodos hijos que implementen IState
+        foreach (Node child in GetChildren())
+        {
+            if (child is IState state)
+            {
+                RegisterState(child.Name, state);
+            }
+        }
+    }
 
     public void RegisterState(string name, IState state) => _states[name] = state;
 
@@ -36,10 +48,18 @@ public partial class StateMachine : Node
     }
 
     public override void _Process(double delta)          => _current?.Update(delta);
+
+    /// <summary>Libera los estados que son nodos creados por código (no viven en el árbol).</summary>
+    public override void _ExitTree()
+    {
+        foreach (var state in _states.Values)
+        {
+            if (state is Node node && !node.IsInsideTree() && IsInstanceValid(node))
+                node.QueueFree();
+        }
+    }
     public override void _PhysicsProcess(double delta)   => _current?.PhysicsUpdate(delta);
 
     public string CurrentStateName =>
-        _states.TryGetValue(_current?.GetType().Name ?? "", out _)
-            ? _states.First(kv => kv.Value == _current).Key
-            : "Unknown";
+        _current is null ? "None" : _states.FirstOrDefault(kv => kv.Value == _current).Key ?? "Unknown";
 }

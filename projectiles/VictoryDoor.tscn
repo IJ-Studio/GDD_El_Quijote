@@ -1,0 +1,42 @@
+[gd_scene load_steps=6 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/puerta_salida_0.png" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/puerta_salida_1.png" id="2_r"]
+[ext_resource type="Script" path="res://projectiles/VictoryDoor.cs" id="3_r"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r")
+}],
+"loop": false,
+"name": &"closed",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("2_r")
+}],
+"loop": false,
+"name": &"open",
+"speed": 1.0
+}]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(52.5, 94.4)
+
+[node name="VictoryDoor" type="Area2D"]
+collision_layer = 0
+collision_mask = 8
+script = ExtResource("3_r")
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_1")
+animation = &"closed"
+offset = Vector2(0.0, -59.0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.0, -47.2)
+shape = SubResource("RectangleShape2D_2")

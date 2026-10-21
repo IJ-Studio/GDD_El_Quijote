@@ -1,0 +1,226 @@
+[gd_scene load_steps=30 format=3]
+
+[ext_resource type="Script" path="res://levels/LevelController.cs" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/backgrounds/almacen.png" id="2_r"]
+[ext_resource type="Script" path="res://combat/ProjectilePool.cs" id="3_r"]
+[ext_resource type="PackedScene" path="res://projectiles/HiloDeQueso.tscn" id="4_r"]
+[ext_resource type="Script" path="res://levels/AdrenalineController.cs" id="5_r"]
+[ext_resource type="PackedScene" path="res://projectiles/FoodPickup.tscn" id="6_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/cofre_0.png" id="7_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/objetos/cofre_1.png" id="8_r"]
+[ext_resource type="PackedScene" path="res://projectiles/VaultKey.tscn" id="9_r"]
+[ext_resource type="PackedScene" path="res://projectiles/VaultDoor.tscn" id="10_r"]
+[ext_resource type="PackedScene" path="res://entities/enemies/SliceOPizza.tscn" id="11_r"]
+[ext_resource type="PackedScene" path="res://entities/enemies/BurgerBashing.tscn" id="12_r"]
+[ext_resource type="PackedScene" path="res://entities/players/DonQuijote.tscn" id="13_r"]
+[ext_resource type="PackedScene" path="res://entities/players/SanchoPanza.tscn" id="14_r"]
+[ext_resource type="Script" path="res://levels/LevelCamera.cs" id="15_r"]
+[ext_resource type="PackedScene" path="res://ui/Hud.tscn" id="16_r"]
+[ext_resource type="PackedScene" path="res://ui/DialogueBox.tscn" id="17_r"]
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
+size = Vector2(1511.89, 80.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_2"]
+size = Vector2(40.0, 2160.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(40.0, 2160.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(262.633, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_5"]
+size = Vector2(92.242, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_6"]
+size = Vector2(256.228, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_7"]
+size = Vector2(76.8683, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_8"]
+size = Vector2(108.897, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_9"]
+size = Vector2(147.331, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_10"]
+size = Vector2(98.6477, 12.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_11"]
+size = Vector2(896.797, 260.0)
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_12"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}],
+"loop": false,
+"name": &"closed",
+"speed": 1.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_r")
+}],
+"loop": false,
+"name": &"open",
+"speed": 1.0
+}]
+
+[node name="Level1Almacen" type="Node2D"]
+script = ExtResource("1_r")
+LevelNumber = 1
+IntroDialogue = "intro"
+CureDialogue = ""
+
+[node name="Fondo" type="Sprite2D" parent="."]
+z_index = -10
+texture_filter = 1
+texture = ExtResource("2_r")
+centered = false
+scale = Vector2(1.28114, 1.28114)
+
+[node name="Mundo" type="Node2D" parent="."]
+
+[node name="Piso" type="StaticBody2D" parent="Mundo"]
+position = Vector2(655.943, 606.263)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Piso"]
+shape = SubResource("RectangleShape2D_1")
+
+[node name="ParedIzq" type="StaticBody2D" parent="Mundo"]
+position = Vector2(-20.0, 360.0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/ParedIzq"]
+shape = SubResource("RectangleShape2D_2")
+
+[node name="ParedDer" type="StaticBody2D" parent="Mundo"]
+position = Vector2(1331.89, 360.0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/ParedDer"]
+shape = SubResource("RectangleShape2D_3")
+
+[node name="Plataforma1" type="StaticBody2D" parent="Mundo"]
+position = Vector2(131.317, 489.395)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma1"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_4")
+one_way_collision = true
+
+[node name="Plataforma2" type="StaticBody2D" parent="Mundo"]
+position = Vector2(46.121, 411.246)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma2"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_5")
+one_way_collision = true
+
+[node name="Plataforma3" type="StaticBody2D" parent="Mundo"]
+position = Vector2(768.683, 486.833)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma3"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_6")
+one_way_collision = true
+
+[node name="Plataforma4" type="StaticBody2D" parent="Mundo"]
+position = Vector2(736.655, 416.37)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma4"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_7")
+one_way_collision = true
+
+[node name="Plataforma5" type="StaticBody2D" parent="Mundo"]
+position = Vector2(829.537, 390.747)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma5"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_8")
+one_way_collision = true
+
+[node name="Plataforma6" type="StaticBody2D" parent="Mundo"]
+position = Vector2(1207.47, 489.395)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma6"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_9")
+one_way_collision = true
+
+[node name="Plataforma7" type="StaticBody2D" parent="Mundo"]
+position = Vector2(1225.41, 413.808)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Mundo/Plataforma7"]
+position = Vector2(0.0, 6.0)
+shape = SubResource("RectangleShape2D_10")
+one_way_collision = true
+
+[node name="ProjectilePool" type="Node" parent="."]
+script = ExtResource("3_r")
+PoolSizePerType = 12
+HiloDeQuesoScene = ExtResource("4_r")
+
+[node name="AdrenalineController" type="Node2D" parent="." node_paths=PackedStringArray("TriggerZone")]
+position = Vector2(422.776, 566.263)
+script = ExtResource("5_r")
+MinDuration = 15.0
+MaxDuration = 25.0
+TriggerZone = NodePath("TriggerZone")
+RewardScene = ExtResource("6_r")
+
+[node name="TriggerZone" type="Area2D" parent="AdrenalineController"]
+collision_layer = 0
+collision_mask = 6
+monitorable = false
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="AdrenalineController/TriggerZone"]
+position = Vector2(384.342, -120.0)
+shape = SubResource("RectangleShape2D_11")
+
+[node name="Cofre" type="AnimatedSprite2D" parent="AdrenalineController"]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_12")
+animation = &"closed"
+offset = Vector2(0.0, -27.0)
+
+[node name="VaultKey" parent="." instance=ExtResource("9_r")]
+position = Vector2(1224.77, 379.808)
+
+[node name="VaultDoor" parent="." instance=ExtResource("10_r")]
+position = Vector2(1241.89, 566.263)
+LevelNumber = 1
+
+[node name="Comida1" parent="." instance=ExtResource("6_r")]
+position = Vector2(46.121, 385.246)
+
+[node name="Pizza1" parent="." instance=ExtResource("11_r")]
+position = Vector2(550.89, 566.263)
+
+[node name="Burger1" parent="." instance=ExtResource("12_r")]
+position = Vector2(999.288, 566.263)
+
+[node name="Pizza2" parent="." instance=ExtResource("11_r")]
+position = Vector2(830.178, 390.747)
+PatrolDistance = 0.0
+
+[node name="DonQuijote" parent="." instance=ExtResource("13_r")]
+position = Vector2(90.0, 566.263)
+
+[node name="SanchoPanza" parent="." instance=ExtResource("14_r")]
+position = Vector2(150.0, 566.263)
+
+[node name="Camara" type="Camera2D" parent="."]
+position = Vector2(655.943, 360.0)
+limit_left = 0
+limit_top = 0
+limit_right = 1311
+limit_bottom = 720
+script = ExtResource("15_r")
+
+[node name="Hud" parent="." instance=ExtResource("16_r")]
+
+[node name="DialogueBox" parent="." instance=ExtResource("17_r")]

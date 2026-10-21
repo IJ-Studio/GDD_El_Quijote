@@ -4,58 +4,73 @@ using Godot;
 /// <summary>
 /// Estado de carrera (Run) del jugador.
 /// </summary>
-public class RunState : IState
+public partial class RunState : Node, IState
 {
-    private const string ANIM_RUN = "run";
-    private readonly Character _owner;
+    private Character _owner = null!;
 
+    public RunState() { }
     public RunState(Character owner) => _owner = owner;
+
+    public override void _Ready()
+    {
+        if (_owner == null)
+        {
+            Node p = GetParent();
+            while (p != null && p is not Character) p = p.GetParent();
+            if (p is Character c) _owner = c;
+        }
+    }
 
     public void Enter()
     {
-        _owner.Sprite.Play(ANIM_RUN);
+        _owner.Sprite.Play("run");
     }
 
     public void Update(double delta)
     {
-        if (Input.IsActionPressed("player_attack") || Input.IsMouseButtonPressed(MouseButton.Left))
+        if (_owner.IsActionJustPressed("attack") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Left)))
         {
             _owner.StateMachine.TransitionTo("Attack");
             return;
         }
 
-        if (Input.IsActionPressed("player_block") || Input.IsMouseButtonPressed(MouseButton.Right))
+        if (_owner.IsActionPressed("block") || (_owner.InputPrefix == "player1_" && Input.IsMouseButtonPressed(MouseButton.Right)))
         {
             _owner.StateMachine.TransitionTo("Block");
             return;
         }
 
-        if (Input.IsActionJustPressed("player_jump") && _owner.IsOnFloor())
+        if (_owner.IsActionJustPressed("jump") && _owner.IsOnFloor())
         {
             _owner.StateMachine.TransitionTo("Jump");
             return;
         }
 
-        float direction = Input.GetAxis("player_left", "player_right");
+        if (!_owner.IsOnFloor())
+        {
+            _owner.StateMachine.TransitionTo("Fall");
+            return;
+        }
+
+        float direction = _owner.GetAxis("left", "right");
         if (Mathf.IsZeroApprox(direction))
         {
             _owner.StateMachine.TransitionTo("Idle");
             return;
         }
 
-        if (direction < 0) _owner.Sprite.FlipH = true;
-        else if (direction > 0) _owner.Sprite.FlipH = false;
+        _owner.SetFacing(direction < 0 ? -1 : 1);
     }
 
     public void PhysicsUpdate(double delta)
     {
-        float direction = Input.GetAxis("player_left", "player_right");
+        float direction = _owner.GetAxis("left", "right");
         Vector2 velocity = _owner.Velocity;
         velocity.X = direction * _owner.Speed;
 
         if (!_owner.IsOnFloor())
         {
-            velocity.Y += (float)(ProjectSettings.GetSetting("physics/2d/default_gravity").AsSingle() * delta);
+            velocity.Y += Character.Gravity * (float)delta;
         }
 
         _owner.Velocity = velocity;

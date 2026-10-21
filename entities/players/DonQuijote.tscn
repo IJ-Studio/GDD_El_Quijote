@@ -1,0 +1,194 @@
+[gd_scene load_steps=26 format=3]
+
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_00.png" id="1_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_01.png" id="2_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_02.png" id="3_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_03.png" id="4_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_04.png" id="5_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_05.png" id="6_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_06.png" id="7_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_07.png" id="8_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_08.png" id="9_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_09.png" id="10_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_10.png" id="11_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_11.png" id="12_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_12.png" id="13_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_13.png" id="14_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_14.png" id="15_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_15.png" id="16_r"]
+[ext_resource type="Texture2D" path="res://assets/sprites/quijote/quijote_16.png" id="17_r"]
+[ext_resource type="Script" path="res://entities/players/DonQuijote.cs" id="18_r"]
+[ext_resource type="Script" path="res://states/StateMachine.cs" id="19_r"]
+[ext_resource type="Script" path="res://combat/Hitbox.cs" id="20_r"]
+[ext_resource type="Script" path="res://combat/Hurtbox.cs" id="21_r"]
+
+[sub_resource type="SpriteFrames" id="SpriteFrames_1"]
+animations = [{
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("1_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("2_r")
+}],
+"loop": true,
+"name": &"idle",
+"speed": 3.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("3_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("4_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("5_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("6_r")
+}],
+"loop": true,
+"name": &"run",
+"speed": 9.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("7_r")
+}],
+"loop": false,
+"name": &"jump",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("8_r")
+}],
+"loop": false,
+"name": &"fall",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("9_r")
+}],
+"loop": false,
+"name": &"crouch",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("10_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("11_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("12_r")
+}],
+"loop": false,
+"name": &"attack",
+"speed": 14.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("13_r")
+}],
+"loop": false,
+"name": &"block",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("14_r")
+}],
+"loop": false,
+"name": &"block_high",
+"speed": 5.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("15_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("15_r")
+}],
+"loop": false,
+"name": &"hurt",
+"speed": 6.0
+}, {
+"frames": [{
+"duration": 1.0,
+"texture": ExtResource("16_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_r")
+}, {
+"duration": 1.0,
+"texture": ExtResource("17_r")
+}],
+"loop": false,
+"name": &"death",
+"speed": 5.0
+}]
+
+[sub_resource type="CapsuleShape2D" id="CapsuleShape2D_2"]
+radius = 12.0
+height = 66.0
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_3"]
+size = Vector2(64.0, 26.0)
+
+[sub_resource type="RectangleShape2D" id="RectangleShape2D_4"]
+size = Vector2(28.0, 70.0)
+
+[node name="DonQuijote" type="CharacterBody2D"]
+collision_layer = 2
+collision_mask = 1
+script = ExtResource("18_r")
+Speed = 210.0
+MaxHealth = 120
+BodyHeight = 80.0
+InvulnerabilityDuration = 0.8
+
+[node name="AnimatedSprite2D" type="AnimatedSprite2D" parent="."]
+texture_filter = 1
+sprite_frames = SubResource("SpriteFrames_1")
+animation = &"idle"
+autoplay = "idle"
+offset = Vector2(0.0, -47.0)
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="."]
+position = Vector2(0.0, -33.0)
+shape = SubResource("CapsuleShape2D_2")
+
+[node name="StateMachine" type="Node" parent="."]
+script = ExtResource("19_r")
+
+[node name="Hitbox" type="Area2D" parent="."]
+collision_layer = 0
+collision_mask = 16
+monitorable = false
+script = ExtResource("20_r")
+Damage = 10
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hitbox"]
+position = Vector2(40.0, -44.0)
+shape = SubResource("RectangleShape2D_3")
+
+[node name="Hurtbox" type="Area2D" parent="."]
+collision_layer = 8
+collision_mask = 0
+monitoring = false
+script = ExtResource("21_r")
+OwnerPath = NodePath("..")
+
+[node name="CollisionShape2D" type="CollisionShape2D" parent="Hurtbox"]
+position = Vector2(0.0, -35.0)
+shape = SubResource("RectangleShape2D_4")
