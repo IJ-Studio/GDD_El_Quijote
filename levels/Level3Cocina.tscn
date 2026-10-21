@@ -1,4 +1,4 @@
-[gd_scene load_steps=25 format=3]
+[gd_scene load_steps=29 format=3]
 
 [ext_resource type="Script" path="res://levels/LevelController.cs" id="1_r"]
 [ext_resource type="Texture2D" path="res://assets/backgrounds/cocina.png" id="2_r"]
@@ -17,6 +17,10 @@
 [ext_resource type="Script" path="res://levels/LevelCamera.cs" id="15_r"]
 [ext_resource type="PackedScene" path="res://ui/Hud.tscn" id="16_r"]
 [ext_resource type="PackedScene" path="res://ui/DialogueBox.tscn" id="17_r"]
+[ext_resource type="Script" path="res://levels/EnemySpawner.cs" id="20_r"]
+[ext_resource type="PackedScene" path="res://entities/enemies/SliceOPizza.tscn" id="21_r"]
+[ext_resource type="PackedScene" path="res://entities/enemies/BurgerBashing.tscn" id="22_r"]
+[ext_resource type="PackedScene" path="res://entities/enemies/PastaDemon.tscn" id="23_r"]
 
 [sub_resource type="RectangleShape2D" id="RectangleShape2D_1"]
 size = Vector2(1770.91, 80.0)
@@ -166,6 +170,27 @@ position = Vector2(1160.0, 490.0)
 
 [node name="TacoMayor" parent="." instance=ExtResource("12_r")]
 position = Vector2(1000.0, 640.0)
+
+[node name="EnemySpawner" type="Node2D" parent="."]
+script = ExtResource("20_r")
+EnemyScenes = Array[PackedScene]([ExtResource("21_r"), ExtResource("22_r"), ExtResource("23_r")])
+InitialHorde = 2
+TotalEnemies = 6
+WaveSize = 2
+WaveInterval = 9.0
+MaxAlive = 5
+
+[node name="Spawn1" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(1450.0, 640.0)
+
+[node name="Spawn2" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(1250.0, 640.0)
+
+[node name="Spawn3" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(700.0, 640.0)
+
+[node name="Spawn4" type="Marker2D" parent="EnemySpawner"]
+position = Vector2(450.0, 640.0)
 
 [node name="DonQuijote" parent="." instance=ExtResource("13_r")]
 position = Vector2(90.0, 640.0)

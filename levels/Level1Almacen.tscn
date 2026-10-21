@@ -211,10 +211,11 @@ PatrolDistance = 0.0
 [node name="EnemySpawner" type="Node2D" parent="."]
 script = ExtResource("18_r")
 EnemyScenes = Array[PackedScene]([ExtResource("11_r"), ExtResource("12_r")])
-InitialHorde = 3
+InitialHorde = 2
+TotalEnemies = 8
 WaveSize = 2
-WaveInterval = 7.0
-MaxAlive = 8
+WaveInterval = 8.0
+MaxAlive = 6
 
 [node name="Spawn1" type="Marker2D" parent="EnemySpawner"]
 position = Vector2(1180.0, 566.263)

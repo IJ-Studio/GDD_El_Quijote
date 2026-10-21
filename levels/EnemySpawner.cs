@@ -3,8 +3,9 @@ using System.Collections.Generic;
 using Godot;
 
 /// <summary>
-/// Generador de hordas de un nivel. Al empezar crea una horda inicial y después, "infinitamente",
-/// añade enemigos de 2 en 2 cada cierto tiempo (mientras no se supere MaxAlive).
+/// Generador de hordas de un nivel. Al empezar crea una horda inicial y después añade enemigos
+/// de 2 en 2 cada cierto tiempo (mientras no se supere MaxAlive) hasta agotar TotalEnemies:
+/// la cantidad de enemigos que aparecen en el nivel es contada, no infinita.
 ///
 /// - Los tipos salen de EnemyScenes y nunca se repite el mismo tipo dos veces seguidas,
 ///   así cada horda (y cada pareja) es variada.
@@ -20,6 +21,9 @@ public partial class EnemySpawner : Node2D
 
     /// <summary>Enemigos que aparecen al empezar el nivel (siempre, sin tope).</summary>
     [Export] public int InitialHorde { get; set; } = 3;
+
+    /// <summary>Total de enemigos que aparecerán en el nivel (horda inicial incluida). Al llegar a este número ya no salen más.</summary>
+    [Export] public int TotalEnemies { get; set; } = 8;
 
     /// <summary>Cuántos enemigos aparecen en cada oleada periódica.</summary>
     [Export] public int WaveSize { get; set; } = 2;
@@ -41,6 +45,10 @@ public partial class EnemySpawner : Node2D
     private float _timer;
     private bool _rushActive;
     private int _lastIndex = -1;
+    private int _spawned;
+
+    /// <summary>Enemigos que aún faltan por aparecer en este nivel.</summary>
+    public int Remaining => Mathf.Max(0, TotalEnemies - _spawned);
 
     public override void _Ready()
     {
@@ -60,7 +68,7 @@ public partial class EnemySpawner : Node2D
 
     public override void _Process(double delta)
     {
-        if (_rushActive || _points.Count == 0 || EnemyScenes.Count == 0) return;
+        if (_rushActive || _points.Count == 0 || EnemyScenes.Count == 0 || Remaining <= 0) return;
 
         _timer -= (float)delta;
         if (_timer > 0f) return;
@@ -75,6 +83,7 @@ public partial class EnemySpawner : Node2D
     private void SpawnEnemies(int count)
     {
         if (_points.Count == 0 || EnemyScenes.Count == 0) return;
+        count = Mathf.Min(count, Remaining);
 
         for (int i = 0; i < count; i++)
         {
@@ -94,6 +103,7 @@ public partial class EnemySpawner : Node2D
             enemy.Position = parent.ToLocal(PickSpawnPoint());
             enemy.Modulate = new Color(1f, 1f, 1f, 0f);
             parent.AddChild(enemy);
+            _spawned++;
             enemy.CreateTween().TweenProperty(enemy, "modulate:a", 1f, FadeInTime);
         }
     }

@@ -245,10 +245,11 @@ position = Vector2(1180.0, 640.0)
 [node name="EnemySpawner" type="Node2D" parent="."]
 script = ExtResource("24_r")
 EnemyScenes = Array[PackedScene]([ExtResource("15_r"), ExtResource("16_r"), ExtResource("17_r"), ExtResource("23_r")])
-InitialHorde = 4
+InitialHorde = 3
+TotalEnemies = 10
 WaveSize = 2
-WaveInterval = 7.0
-MaxAlive = 10
+WaveInterval = 8.0
+MaxAlive = 7
 
 [node name="Spawn1" type="Marker2D" parent="EnemySpawner"]
 position = Vector2(1250.0, 640.0)
