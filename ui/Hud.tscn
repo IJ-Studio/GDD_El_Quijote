@@ -32,14 +32,16 @@ border_width_right = 2
 border_width_bottom = 2
 border_color = Color(0, 0, 0, 1)
 
-[node name="Hud" type="CanvasLayer" node_paths=PackedStringArray("_healthBar", "_healthBarP2", "_panelP2", "_hearts", "_livesLabel", "_killsLabel", "_keyIcon", "_cureIcon", "_adrenalineBanner", "_adrenalineFrame", "_bossPanel", "_bossBar")]
+[node name="Hud" type="CanvasLayer" node_paths=PackedStringArray("_healthBar", "_healthBarP2", "_panelP2", "_hearts", "_livesLabel", "_heartsP2", "_livesLabelP2", "_killsLabel", "_keyIcon", "_cureIcon", "_adrenalineBanner", "_adrenalineFrame", "_bossPanel", "_bossBar")]
 layer = 10
 script = ExtResource("3_r")
 _healthBar = NodePath("Root/PanelP1/VBox/Fila/HealthBar")
-_healthBarP2 = NodePath("Root/PanelP2/Fila/HealthBar")
+_healthBarP2 = NodePath("Root/PanelP2/VBox/Fila/HealthBar")
 _panelP2 = NodePath("Root/PanelP2")
 _hearts = NodePath("Root/PanelP1/VBox/Vidas/Hearts")
 _livesLabel = NodePath("Root/PanelP1/VBox/Vidas/LivesLabel")
+_heartsP2 = NodePath("Root/PanelP2/VBox/Vidas/Hearts")
+_livesLabelP2 = NodePath("Root/PanelP2/VBox/Vidas/LivesLabel")
 _killsLabel = NodePath("Root/KillsLabel")
 _keyIcon = NodePath("Root/Objetos/KeyIcon")
 _cureIcon = NodePath("Root/Objetos/CureIcon")
@@ -149,14 +151,18 @@ layout_mode = 0
 offset_left = 16.0
 offset_top = 100.0
 offset_right = 380.0
-offset_bottom = 140.0
+offset_bottom = 178.0
 mouse_filter = 2
 
-[node name="Fila" type="HBoxContainer" parent="Root/PanelP2"]
+[node name="VBox" type="VBoxContainer" parent="Root/PanelP2"]
+layout_mode = 2
+theme_override_constants/separation = 8
+
+[node name="Fila" type="HBoxContainer" parent="Root/PanelP2/VBox"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="Nombre" type="Label" parent="Root/PanelP2/Fila"]
+[node name="Nombre" type="Label" parent="Root/PanelP2/VBox/Fila"]
 layout_mode = 2
 text = "SANCHO"
 horizontal_alignment = 0
@@ -164,13 +170,53 @@ theme_override_font_sizes/font_size = 10
 theme_override_colors/font_color = Color(1, 0.7, 0.3, 1)
 custom_minimum_size = Vector2(84.0, 0.0)
 
-[node name="HealthBar" type="ProgressBar" parent="Root/PanelP2/Fila"]
+[node name="HealthBar" type="ProgressBar" parent="Root/PanelP2/VBox/Fila"]
 custom_minimum_size = Vector2(230.0, 16.0)
 layout_mode = 2
 size_flags_vertical = 4
 theme_override_styles/fill = SubResource("StyleBoxFlat_2")
 value = 100.0
 show_percentage = false
+
+[node name="Vidas" type="HBoxContainer" parent="Root/PanelP2/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 4
+
+[node name="Hearts" type="HBoxContainer" parent="Root/PanelP2/VBox/Vidas"]
+layout_mode = 2
+theme_override_constants/separation = 3
+
+[node name="Heart0" type="TextureRect" parent="Root/PanelP2/VBox/Vidas/Hearts"]
+layout_mode = 2
+texture = ExtResource("1_r")
+stretch_mode = 3
+
+[node name="Heart1" type="TextureRect" parent="Root/PanelP2/VBox/Vidas/Hearts"]
+layout_mode = 2
+texture = ExtResource("1_r")
+stretch_mode = 3
+
+[node name="Heart2" type="TextureRect" parent="Root/PanelP2/VBox/Vidas/Hearts"]
+layout_mode = 2
+texture = ExtResource("1_r")
+stretch_mode = 3
+
+[node name="Heart3" type="TextureRect" parent="Root/PanelP2/VBox/Vidas/Hearts"]
+layout_mode = 2
+texture = ExtResource("1_r")
+stretch_mode = 3
+
+[node name="Heart4" type="TextureRect" parent="Root/PanelP2/VBox/Vidas/Hearts"]
+layout_mode = 2
+texture = ExtResource("1_r")
+stretch_mode = 3
+
+[node name="LivesLabel" type="Label" parent="Root/PanelP2/VBox/Vidas"]
+layout_mode = 2
+text = "x5"
+horizontal_alignment = 0
+theme_override_font_sizes/font_size = 10
+size_flags_vertical = 4
 
 [node name="KillsLabel" type="Label" parent="Root"]
 layout_mode = 1

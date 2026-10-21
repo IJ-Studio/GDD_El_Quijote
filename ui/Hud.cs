@@ -13,6 +13,8 @@ public partial class Hud : CanvasLayer
     [Export] private Control?       _panelP2;
     [Export] private HBoxContainer? _hearts;
     [Export] private Label?         _livesLabel;
+    [Export] private HBoxContainer? _heartsP2;
+    [Export] private Label?         _livesLabelP2;
     [Export] private Label?         _killsLabel;
     [Export] private TextureRect?   _keyIcon;
     [Export] private TextureRect?   _cureIcon;
@@ -46,7 +48,8 @@ public partial class Hud : CanvasLayer
         if (_adrenalineBanner is not null) _adrenalineBanner.Visible = false;
         if (_adrenalineFrame is not null)  _adrenalineFrame.Visible = false;
         if (_bossPanel is not null)  _bossPanel.Visible = false;
-        UpdateLivesDisplay(GameManager.Instance.GetLives(0));
+        UpdateLivesDisplay(_hearts, _livesLabel, GameManager.Instance.GetLives(0));
+        UpdateLivesDisplay(_heartsP2, _livesLabelP2, GameManager.Instance.GetLives(1));
         OnEnemiesDefeatedChanged(GameManager.Instance.EnemiesDefeated);
     }
 
@@ -70,7 +73,9 @@ public partial class Hud : CanvasLayer
 
     private void OnLivesChanged(int playerIndex, int lives)
     {
-        if (playerIndex == 0) UpdateLivesDisplay(lives);
+        // Cada personaje tiene sus propias vidas: se actualiza solo su fila
+        if (playerIndex == 0) UpdateLivesDisplay(_hearts, _livesLabel, lives);
+        else                  UpdateLivesDisplay(_heartsP2, _livesLabelP2, lives);
     }
 
     private void OnEnemiesDefeatedChanged(int total)
@@ -110,15 +115,15 @@ public partial class Hud : CanvasLayer
         if (_adrenalineFrame is not null)  _adrenalineFrame.Visible = false;
     }
 
-    /// <summary>Dibuja un corazón lleno por cada vida.</summary>
-    private void UpdateLivesDisplay(int livesRemaining)
+    /// <summary>Dibuja un corazón lleno por cada vida del personaje al que pertenece la fila.</summary>
+    private void UpdateLivesDisplay(HBoxContainer? hearts, Label? label, int livesRemaining)
     {
         int lives = Mathf.Max(0, livesRemaining);
-        if (_livesLabel is not null) _livesLabel.Text = $"x{lives}";
-        if (_hearts is null) return;
-        for (int i = 0; i < _hearts.GetChildCount(); i++)
+        if (label is not null) label.Text = $"x{lives}";
+        if (hearts is null) return;
+        for (int i = 0; i < hearts.GetChildCount(); i++)
         {
-            if (_hearts.GetChild(i) is TextureRect heart)
+            if (hearts.GetChild(i) is TextureRect heart)
                 heart.Texture = i < lives ? _heartFull : _heartEmpty;
         }
     }
