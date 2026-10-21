@@ -34,7 +34,22 @@ public abstract partial class Enemy : Character
     /// <summary>Distancia (px) que patrulla a cada lado de su posición inicial. 0 = no patrulla.</summary>
     [Export] public float PatrolDistance { get; set; } = 50f;
 
+    /// <summary>Segundos que se tambalea (sin patrullar ni atacar) tras recibir un golpe.</summary>
+    [Export] public float HitStunDuration { get; set; } = 0.35f;
+
+    /// <summary>
+    /// Pausa mínima (segundos) antes de poder atacar después de recibir daño,
+    /// para que no devuelva el golpe al instante.
+    /// </summary>
+    [Export] public float PostHitAttackDelay { get; set; } = 0.8f;
+
     public float CooldownLeft { get; set; } = 0f;
+
+    /// <summary>Tiempo restante de aturdimiento por golpe (lo respeta GuardState).</summary>
+    public float StunLeft { get; set; } = 0f;
+
+    /// <summary>Si es falso (jefe), los golpes no lo aturden, no interrumpen su ataque ni retrasan el siguiente.</summary>
+    protected virtual bool ReactsToHits => true;
     public float PatrolOriginX { get; private set; }
     public bool IsAdrenalineActive { get; private set; } = false;
 
@@ -58,6 +73,7 @@ public abstract partial class Enemy : Character
     public override void _PhysicsProcess(double delta)
     {
         if (CooldownLeft > 0f) CooldownLeft -= (float)delta;
+        if (StunLeft > 0f) StunLeft -= (float)delta;
     }
 
     /// <summary>Primer jugador vivo dentro de la GuardZone (o null).</summary>
@@ -107,11 +123,23 @@ public abstract partial class Enemy : Character
 
     public override void TakeDamage(int amount)
     {
-        bool wasAlive = CurrentHealth > 0;
+        int healthBefore = CurrentHealth;
         base.TakeDamage(amount);
+
+        // Solo reacciona si de verdad perdió vida y sigue vivo
+        if (healthBefore <= 0 || CurrentHealth <= 0 || CurrentHealth >= healthBefore) return;
+
         // pequeño retroceso al recibir el golpe
-        if (wasAlive && CurrentHealth > 0)
-            Velocity = new Vector2(-Facing * 90f, -60f);
+        Velocity = new Vector2(-Facing * 90f, -60f);
+
+        if (!ReactsToHits) return;
+
+        // El golpe interrumpe un ataque en curso y le impone una pausa antes del siguiente
+        if (StateMachine.CurrentStateName == "EnemyAttack")
+            StateMachine.TransitionTo(IsAdrenalineActive ? "Alert" : "Guard");
+
+        StunLeft = Mathf.Max(StunLeft, HitStunDuration);
+        CooldownLeft = Mathf.Max(CooldownLeft, PostHitAttackDelay);
     }
 
     public override void _ExitTree()

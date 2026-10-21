@@ -17,6 +17,9 @@ public partial class TacoMayor : Enemy
     [Export] public float AttackCooldownPhase3 { get; set; } = 0.9f;
     [Export] public float ChargeSpeedPhase3 { get; set; } = 280f;
 
+    /// <summary>El jefe no se aturde ni pierde su ataque por un golpe: mantiene su ritmo por fases.</summary>
+    protected override bool ReactsToHits => false;
+
     private TacoMayorPhase _currentPhase = TacoMayorPhase.Phase1;
     private float _timeSinceAttack = 0f;
     private int _attackCount = 0;

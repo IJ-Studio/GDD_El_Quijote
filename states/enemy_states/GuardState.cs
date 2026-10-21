@@ -31,6 +31,16 @@ public class GuardState : IState
         if (!_owner.IsOnFloor())
             velocity.Y += Character.Gravity * (float)delta;
 
+        // Tambaleo tras recibir un golpe: no patrulla ni ataca hasta recuperarse
+        if (_owner.StunLeft > 0f)
+        {
+            velocity.X = Mathf.MoveToward(velocity.X, 0, 400f * (float)delta);
+            PlayIfExists("hurt");
+            _owner.Velocity = velocity;
+            _owner.MoveAndSlide();
+            return;
+        }
+
         Character? target = _owner.FindTarget();
         if (target != null)
         {
