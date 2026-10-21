@@ -5,8 +5,9 @@ using Godot;
 /// Puerta de salida de un nivel. Se abre si el jugador cumple la condición
 /// (llave en el Nivel 1, Cura de la Sazón en el Nivel 2) y avisa al GameManager
 /// mediante EventBus.LevelCompleted. Si no la cumple, parpadea en rojo.
+/// Para abrirla hay que MANTENER pulsada la tecla de interactuar hasta llenar la barra.
 /// </summary>
-public partial class VaultDoor : Area2D
+public partial class VaultDoor : HoldInteractDoor
 {
     [Export] public float RejectFlashDuration { get; set; } = 0.3f;
 
@@ -20,17 +21,17 @@ public partial class VaultDoor : Area2D
     private AnimatedSprite2D? _sprite;
     private float _flashTimer = 0f;
     private bool _isFlashing = false;
-    private bool _opened = false;
 
     public override void _Ready()
     {
+        base._Ready();
         _flashOverlay = GetNodeOrNull<Control>("FlashOverlay");
         _sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
-        AreaEntered += OnAreaEntered;
     }
 
     public override void _Process(double delta)
     {
+        base._Process(delta);
         if (!_isFlashing) return;
         _flashTimer -= (float)delta;
         if (_flashTimer <= 0)
@@ -47,12 +48,8 @@ public partial class VaultDoor : Area2D
         return keyOk && cureOk;
     }
 
-    private void OnAreaEntered(Area2D area)
+    protected override void OnHoldCompleted()
     {
-        // Solo reaccionar a Hurtbox del jugador
-        if (area is not Hurtbox || _opened)
-            return;
-
         if (CanOpen())
             OnDoorUnlocked();
         else
@@ -61,7 +58,7 @@ public partial class VaultDoor : Area2D
 
     private void OnDoorUnlocked()
     {
-        _opened = true;
+        Resolved = true;
         GD.Print($"[VaultDoor] Puerta abierta. Terminando nivel {LevelNumber}...");
         if (_sprite?.SpriteFrames?.HasAnimation("open") == true) _sprite.Play("open");
         AudioManager.Instance?.PlaySfx("recoger", -4f);
@@ -79,8 +76,4 @@ public partial class VaultDoor : Area2D
         AudioManager.Instance?.PlaySfx("bloqueo", -10f);
     }
 
-    public override void _ExitTree()
-    {
-        AreaEntered -= OnAreaEntered;
-    }
 }

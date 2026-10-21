@@ -9,15 +9,16 @@ using Godot;
 /// 3. GameManager.CurrentLives >= 1
 ///
 /// Si se cumplen, emite EventBus.LevelCompleted() y transiciona al próximo nivel.
+/// Para abrirla hay que MANTENER pulsada la tecla de interactuar hasta llenar la barra.
 /// </summary>
-public partial class VictoryDoor : Area2D
+public partial class VictoryDoor : HoldInteractDoor
 {
     private TacoMayor? _boss;
     private bool _isBossDefeated = false;
 
     public override void _Ready()
     {
-        AreaEntered += OnAreaEntered;
+        base._Ready();
         EventBus.Instance.EnemyKilled += OnEnemyKilled;
 
         // Buscar TacoMayor en la escena padre
@@ -33,12 +34,8 @@ public partial class VictoryDoor : Area2D
         }
     }
 
-    private void OnAreaEntered(Area2D area)
+    protected override void OnHoldCompleted()
     {
-        // Solo reaccionar si toca Hurtbox de un jugador
-        if (area is not Hurtbox hurtbox || hurtbox.GetParent() is not Character)
-            return;
-
         if (ValidateVictoryConditions())
         {
             TriggerVictory();
@@ -66,7 +63,7 @@ public partial class VictoryDoor : Area2D
         var sprite = GetNodeOrNull<AnimatedSprite2D>("AnimatedSprite2D");
         if (sprite?.SpriteFrames?.HasAnimation("open") == true) sprite.Play("open");
         AudioManager.Instance?.PlaySfx("recoger", -4f);
-        SetDeferred(Area2D.PropertyName.Monitoring, false);
+        Resolved = true;
         // GameManager cambia a la pantalla de victoria al recibir LevelCompleted(3)
         GetTree().CreateTimer(0.8).Timeout += () => EventBus.Instance.EmitLevelCompleted(3);
     }
@@ -88,7 +85,7 @@ public partial class VictoryDoor : Area2D
 
     public override void _ExitTree()
     {
-        AreaEntered -= OnAreaEntered;
+        base._ExitTree();
         if (EventBus.Instance != null)
             EventBus.Instance.EnemyKilled -= OnEnemyKilled;
     }
