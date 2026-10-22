@@ -209,7 +209,7 @@ animation = &"closed"
 offset = Vector2(0.0, -27.0)
 
 [node name="ReversionPlatform" parent="." instance=ExtResource("12_r")]
-position = Vector2(1000.0, 285.0)
+position = Vector2(1000.0, 552.0)
 
 [node name="CurePickup" parent="." instance=ExtResource("13_r")]
 position = Vector2(1390.0, 640.0)
