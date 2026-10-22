@@ -96,7 +96,7 @@ public partial class SalsaPicante : BaseProjectile
                 if (hurtbox.Fighter is { } target && !LineOfSight.IsClear(this, origin, target.Center))
                     continue;
 
-                hurtbox.ReceiveDamage(Enemy.ScaleDamage(AreaDamage));
+                hurtbox.ReceiveDamage(Enemy.ScaleDamage(Mathf.RoundToInt(AreaDamage * DamageMultiplier)));
             }
         }
     }

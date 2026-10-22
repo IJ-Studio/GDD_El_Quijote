@@ -11,6 +11,12 @@ public abstract partial class BaseProjectile : Area2D
     [Export] public int Damage { get; set; } = 10;
     [Export] public float Lifetime { get; set; } = 5f;
 
+    /// <summary>
+    /// Multiplicador de daño de este lanzamiento (el jefe lo sube). Vuelve a 1 cada vez que el
+    /// proyectil sale del pool; hay que fijarlo justo antes de llamar a Launch.
+    /// </summary>
+    public float DamageMultiplier { get; set; } = 1f;
+
     public ProjectilePool? Pool { get; set; }
     public ProjectileType Type { get; set; }
 
@@ -33,6 +39,7 @@ public abstract partial class BaseProjectile : Area2D
 
     public virtual void Launch(Vector2 position, Vector2 direction)
     {
+        if (Hitbox != null) Hitbox.Damage = Enemy.ScaleDamage(Mathf.RoundToInt(Damage * DamageMultiplier));
         GlobalPosition = position;
         Direction = direction.Normalized();
         Rotation = Direction.Angle();
@@ -56,6 +63,7 @@ public abstract partial class BaseProjectile : Area2D
 
     public virtual void Enable()
     {
+        DamageMultiplier = 1f;
         Show();
         SetProcess(true);
         SetDeferred(Area2D.PropertyName.Monitoring, true);
