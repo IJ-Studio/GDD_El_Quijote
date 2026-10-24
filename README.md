@@ -1,7 +1,7 @@
 # El Quijote: La Búsqueda de la Sazón Perdida
 
-Beat 'em up / plataformas 2D en **Godot 4.7.2 (.NET) + C# 14 / .NET 10**.
-IJ-STUDIO · Optativa 1: Creación de Videojuegos · Docente: Juvencio Mendoza Castelán
+/ plataformas 2D en **Godot 4.7.2 (.NET) + C# 14 / .NET 10**.
+IJ-STUDIO · Optativa 1: Creación de Videojuegos · 
 
 ---
 
