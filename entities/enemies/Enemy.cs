@@ -43,6 +43,12 @@ public abstract partial class Enemy : Character
     /// </summary>
     [Export] public float PostHitAttackDelay { get; set; } = 0.8f;
 
+    /// <summary>
+    /// Segundos que el enemigo se prepara (quieto y parpadeando en rojo) antes de que su ataque
+    /// haga daño. Si el jugador le pega en ese momento, el ataque se cancela.
+    /// </summary>
+    [Export] public float AttackWindup { get; set; } = 0.35f;
+
     public float CooldownLeft { get; set; } = 0f;
 
     /// <summary>Tiempo restante de aturdimiento por golpe (lo respeta GuardState).</summary>
@@ -108,6 +114,13 @@ public abstract partial class Enemy : Character
         }
     }
 
+    /// <summary>Punto de disparo frente al enemigo a una altura dada (px sobre sus pies).</summary>
+    public Vector2 MuzzleAtHeight(float height)
+    {
+        Vector2 muzzle = GlobalPosition + new Vector2(Facing * BodyHeight * 0.35f, -height);
+        return LineOfSight.IsClear(this, Center, muzzle) ? muzzle : Center;
+    }
+
     /// <summary>
     /// Respuesta base ante la Oleada de Adrenalina: duplica velocidad y
     /// transiciona a Alert. Las subclases pueden sobreescribir.
@@ -141,7 +154,7 @@ public abstract partial class Enemy : Character
         if (healthBefore <= 0 || CurrentHealth <= 0 || CurrentHealth >= healthBefore) return;
 
         // pequeño retroceso al recibir el golpe
-        Velocity = new Vector2(-Facing * 90f, -60f);
+        Velocity = new Vector2(KnockbackDirection * 90f, -60f);
 
         if (!ReactsToHits) return;
 

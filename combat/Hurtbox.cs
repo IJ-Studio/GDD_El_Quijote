@@ -21,4 +21,10 @@ public partial class Hurtbox : Area2D
     {
         _owner?.TakeDamage(amount);
     }
+
+    /// <summary>Recibe daño indicando de dónde vino, para empujar al dueño en la dirección correcta.</summary>
+    public void ReceiveDamage(int amount, Vector2 source)
+    {
+        _owner?.TakeDamage(amount, source);
+    }
 }

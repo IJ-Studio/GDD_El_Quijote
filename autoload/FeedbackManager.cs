@@ -53,13 +53,38 @@ public partial class FeedbackManager : Node
         if (isPlayer)
         {
             Shake(killed ? 0.7f : 0.45f);
+            HitStop(target.LastDamageWasBlocked ? 0.03f : 0.06f);
             AudioManager.Instance?.PlaySfx("dano", -4f);
         }
         else
         {
             Shake(killed ? 0.4f : 0.18f);
+            HitStop(killed ? 0.09f : 0.05f);
             AudioManager.Instance?.PlaySfx(killed ? "enemigo_muere" : "golpe", -4f);
         }
+    }
+
+    // ── Hitstop: congelar el juego una fracción de segundo al conectar un golpe ──
+    private ulong _hitStopUntilMs;
+    private int _hitStopId;
+
+    /// <summary>
+    /// Casi detiene el tiempo unos milisegundos para que cada golpe "pese".
+    /// Si llegan varios golpes seguidos, manda el que termina más tarde; solo ese
+    /// devuelve el tiempo a la normalidad.
+    /// </summary>
+    private async void HitStop(float seconds)
+    {
+        if (GetTree().Paused) return;
+        ulong until = Time.GetTicksMsec() + (ulong)(seconds * 1000f);
+        if (until <= _hitStopUntilMs) return;
+        _hitStopUntilMs = until;
+        int id = ++_hitStopId;
+        Engine.TimeScale = 0.05;
+
+        // Temporizador que ignora la escala de tiempo (si no, tardaría 20 veces más)
+        await ToSignal(GetTree().CreateTimer(seconds, true, false, true), SceneTreeTimer.SignalName.Timeout);
+        if (id == _hitStopId) Engine.TimeScale = 1.0;
     }
 
     private void OnAttackBlocked(Character target)

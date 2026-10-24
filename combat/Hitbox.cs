@@ -28,7 +28,9 @@ public partial class Hitbox : Area2D
             if (GetParent() is Enemy attacker && hurtbox.Fighter is { } target
                 && !LineOfSight.IsClear(this, attacker.Center, target.Center))
                 return;
-            hurtbox.ReceiveDamage(Damage);
+            // El retroceso empuja lejos del atacante (o del proyectil)
+            Vector2 source = GetParent() is Node2D owner ? owner.GlobalPosition : GlobalPosition;
+            hurtbox.ReceiveDamage(Damage, source);
         }
     }
 

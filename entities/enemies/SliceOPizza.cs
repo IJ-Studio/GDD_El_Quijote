@@ -22,13 +22,15 @@ public partial class SliceOPizza : Enemy
     {
         public ShootState(Enemy owner) : base(owner, "attack") { }
 
-        public override void Enter()
+        protected override void Strike()
         {
-            base.Enter();
+            base.Strike();
 
             // Disparar proyectil desde el pool, hacia donde mira
             var p = ProjectilePool.Instance.Get(ProjectileType.HiloDeQueso);
-            p?.Launch(Owner.MuzzlePosition, new Vector2(Owner.Facing, 0));
+            // Sale de la orilla de la pizza, a la altura de la cabeza del jugador:
+            // agachado, el queso le pasa por encima.
+            p?.Launch(Owner.MuzzleAtHeight(64f), new Vector2(Owner.Facing, 0));
             AudioManager.Instance?.PlaySfx("disparo", -10f);
         }
     }

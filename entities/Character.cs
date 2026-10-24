@@ -49,6 +49,28 @@ public abstract partial class Character : CharacterBody2D
 
     private readonly List<(CollisionShape2D Shape, float BaseX)> _hitboxShapes = new();
 
+    // ── Golpes recibidos ──────────────────────────────────────────
+    /// <summary>Posición de quien dio el golpe que se está procesando (null si no se conoce).</summary>
+    public Vector2? LastHitSource { get; private set; }
+
+    /// <summary>Hacia dónde empuja el golpe actual: lejos de quien lo dio (1 = derecha, -1 = izquierda).</summary>
+    public int KnockbackDirection =>
+        LastHitSource is { } source && !Mathf.IsEqualApprox(source.X, GlobalPosition.X)
+            ? (GlobalPosition.X > source.X ? 1 : -1)
+            : -Facing;
+
+    // ── Salto más justo: coyote time y buffer ─────────────────────
+    /// <summary>Segundos que aún se puede saltar después de dejar el borde de una plataforma.</summary>
+    private const float CoyoteTime = 0.1f;
+    /// <summary>Segundos que se "recuerda" haber pulsado saltar justo antes de tocar el suelo.</summary>
+    private const float JumpBufferTime = 0.12f;
+    private float _coyoteLeft;
+    private float _jumpBufferLeft;
+
+    // ── Hurtbox al agacharse ──────────────────────────────────────
+    private CollisionShape2D? _hurtShape;
+    private Vector2 _hurtSize, _hurtPosition;
+
     public override void _Ready()
     {
         CurrentHealth = MaxHealth;
@@ -59,6 +81,16 @@ public abstract partial class Character : CharacterBody2D
         // Intentar obtener Hitbox y Hurtbox de forma opcional si existen en la jerarquía del nodo
         Hitbox  = GetNodeOrNull<Hitbox>("Hitbox");
         Hurtbox = GetNodeOrNull<Hurtbox>("Hurtbox");
+
+        // Copia propia de la forma de la Hurtbox para poder encogerla al agacharse
+        // sin afectar a otras instancias de la misma escena.
+        _hurtShape = Hurtbox?.GetNodeOrNull<CollisionShape2D>("CollisionShape2D");
+        if (_hurtShape?.Shape is RectangleShape2D rect)
+        {
+            _hurtShape.Shape = (RectangleShape2D)rect.Duplicate();
+            _hurtSize = rect.Size;
+            _hurtPosition = _hurtShape.Position;
+        }
 
         if (Hitbox is not null)
         {
@@ -75,6 +107,10 @@ public abstract partial class Character : CharacterBody2D
 
     public override void _Process(double delta)
     {
+        // Buffer de salto y coyote time (se consultan desde los estados con ConsumeJumpRequest)
+        _jumpBufferLeft = IsActionJustPressed("jump") ? JumpBufferTime : _jumpBufferLeft - (float)delta;
+        _coyoteLeft = IsOnFloor() ? CoyoteTime : _coyoteLeft - (float)delta;
+
         if (IsInvulnerable)
         {
             _invulnerabilityTimer -= (float)delta;
@@ -145,6 +181,39 @@ public abstract partial class Character : CharacterBody2D
         if (clean.StartsWith("ui_") && InputMap.HasAction(clean)) yield return clean;
     }
 
+    /// <summary>
+    /// True (una sola vez) si toca saltar: se pulsó saltar hace muy poco y el personaje está en
+    /// el suelo o acaba de dejarlo. Así el salto no se "pierde" por llegar unos milisegundos tarde.
+    /// </summary>
+    public bool ConsumeJumpRequest()
+    {
+        if (_jumpBufferLeft <= 0f || _coyoteLeft <= 0f) return false;
+        _jumpBufferLeft = 0f;
+        _coyoteLeft = 0f;
+        return true;
+    }
+
+    /// <summary>
+    /// Agachado, la Hurtbox baja a la mitad inferior del cuerpo: lo que vuela a la altura
+    /// del pecho (como el hilo de queso) pasa por encima.
+    /// </summary>
+    public void SetCrouchHurtbox(bool crouched)
+    {
+        if (_hurtShape?.Shape is not RectangleShape2D rect) return;
+        if (crouched)
+        {
+            float height = _hurtSize.Y * 0.6f;
+            float bottom = _hurtPosition.Y + _hurtSize.Y / 2f;
+            rect.Size = new Vector2(_hurtSize.X, height);
+            _hurtShape.Position = new Vector2(_hurtPosition.X, bottom - height / 2f);
+        }
+        else
+        {
+            rect.Size = _hurtSize;
+            _hurtShape.Position = _hurtPosition;
+        }
+    }
+
     /// <summary>Cada subclase registra sus propios estados en la FSM.</summary>
     protected abstract void InitializeStates();
 
@@ -159,6 +228,14 @@ public abstract partial class Character : CharacterBody2D
     /// Emite HealthChanged y DamageDealt vía EventBus. Llama a Die() si CurrentHealth llega a 0.
     /// </summary>
     /// <param name="amount">Daño a aplicar (valor positivo).</param>
+    /// <summary>Recibe daño sabiendo de dónde vino (el retroceso empuja lejos de esa posición).</summary>
+    public void TakeDamage(int amount, Vector2 source)
+    {
+        LastHitSource = source;
+        TakeDamage(amount);
+        LastHitSource = null;
+    }
+
     public virtual void TakeDamage(int amount)
     {
         if (IsInvulnerable || CurrentHealth <= 0) return;

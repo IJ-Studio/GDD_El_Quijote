@@ -33,7 +33,9 @@ public partial class HurtState : Node, IState
             _owner.Sprite.Play("idle");
         }
         _owner.Sprite.AnimationFinished += OnAnimationFinished;
-        _owner.Velocity = new Vector2(-_owner.Facing * 170f, -160f);
+        // Retroceso lejos de quien pegó (antes empujaba hacia atrás de donde miraba,
+        // y un golpe por la espalda lo lanzaba contra el enemigo)
+        _owner.Velocity = new Vector2(_owner.KnockbackDirection * 170f, -160f);
         _timer = 0.45f;
     }
 

@@ -42,7 +42,7 @@ public partial class IdleState : Node, IState
             return;
         }
 
-        if (_owner.IsActionJustPressed("jump") && _owner.IsOnFloor())
+        if (_owner.ConsumeJumpRequest())
         {
             _owner.StateMachine.TransitionTo("Jump");
             return;

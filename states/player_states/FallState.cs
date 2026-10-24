@@ -37,6 +37,13 @@ public partial class FallState : Node, IState
             return;
         }
 
+        // Coyote time: saltar justo después de dejar el borde todavía cuenta
+        if (_owner.ConsumeJumpRequest())
+        {
+            _owner.StateMachine.TransitionTo("Jump");
+            return;
+        }
+
         if (_owner.IsOnFloor())
         {
             AudioManager.Instance?.PlaySfx("aterrizar", -12f);

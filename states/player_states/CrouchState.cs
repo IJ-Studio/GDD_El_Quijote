@@ -25,6 +25,7 @@ public partial class CrouchState : Node, IState
     {
         _owner.Sprite.Play("crouch");
         _owner.Velocity = new Vector2(0, _owner.Velocity.Y);
+        _owner.SetCrouchHurtbox(true);
     }
 
     public void Update(double delta)
@@ -44,5 +45,8 @@ public partial class CrouchState : Node, IState
         _owner.MoveAndSlide();
     }
 
-    public void Exit() { }
+    public void Exit()
+    {
+        _owner.SetCrouchHurtbox(false);
+    }
 }

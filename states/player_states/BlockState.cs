@@ -36,7 +36,8 @@ public partial class BlockState : Node, IState
     public void Update(double delta)
     {
         bool wasHigh = IsHighBlock;
-        IsHighBlock = _owner.IsActionPressed("jump") || _owner.IsActionPressed("ui_up");
+        // Solo la tecla de saltar de ESTE jugador (antes "ui_up" mezclaba la flecha de Sancho)
+        IsHighBlock = _owner.IsActionPressed("jump");
         if (wasHigh != IsHighBlock)
         {
             UpdateBlockAnimation();

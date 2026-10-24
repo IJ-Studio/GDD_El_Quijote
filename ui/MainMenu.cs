@@ -60,7 +60,7 @@ public partial class MainMenu : Control
     private void RefreshControlsHint()
     {
         if (_controlsHint is null) return;
-        _controlsHint.Text = $"J1: {ControlBindings.Describe(0)}\nJ2: {ControlBindings.Describe(1)}        P/ESC pausa";
+        _controlsHint.Text = $"J1: {ControlBindings.Describe(0)}\nJ2: {ControlBindings.Describe(1)}\nP/ESC pausa";
     }
 
     private void OnExitPressed()

@@ -28,30 +28,15 @@ public partial class PastaDemon : Enemy
     private class TossState : EnemyAttackState
     {
         private readonly PastaDemon _demon;
-        private bool _thrown;
 
         public TossState(PastaDemon owner) : base(owner, "attack")
         {
             _demon = owner;
         }
 
-        public override void Enter()
+        protected override void Strike()
         {
-            base.Enter();
-            _thrown = false;
-            _demon.Sprite.FrameChanged += OnFrameChanged;
-        }
-
-        public override void Exit()
-        {
-            _demon.Sprite.FrameChanged -= OnFrameChanged;
-            base.Exit();
-        }
-
-        private void OnFrameChanged()
-        {
-            if (_thrown || _demon.Sprite.Frame < 1) return;
-            _thrown = true;
+            base.Strike();
             var p = ProjectilePool.Instance.Get(ProjectileType.Albondiga);
             p?.Launch(_demon.MuzzlePosition, new Vector2(_demon.Facing, -_demon.TossArc));
             AudioManager.Instance?.PlaySfx("disparo", -10f);

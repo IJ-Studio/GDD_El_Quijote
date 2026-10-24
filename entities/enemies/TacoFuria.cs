@@ -35,9 +35,9 @@ public partial class TacoFuria : Enemy
             _taco = owner;
         }
 
-        public override void Enter()
+        protected override void Strike()
         {
-            base.Enter();
+            base.Strike();
             for (int i = 0; i < _taco.DropsPerAttack; i++)
             {
                 var p = ProjectilePool.Instance.Get(ProjectileType.SalsaPicante);

@@ -35,7 +35,22 @@ IJ-STUDIO · Optativa 1: Creación de Videojuegos · Docente: Juvencio Mendoza C
 | Pausa | P / Esc | P / Esc |
 | Avanzar diálogo | Enter / Espacio / atacar / clic | — |
 
-Escudo normal: recibe la mitad del daño. Escudo alto: bloquea todo.
+Escudo normal: recibe muy poco daño. Escudo alto: bloquea todo.
+
+**Todas las teclas se pueden cambiar** en *Menú principal → Controles* (o desde la pausa).
+Si eliges una tecla que ya usa otra acción, las dos se intercambian. Los cambios se guardan
+solos (`user://controles.cfg`) y *Restaurar* vuelve a las de la tabla.
+
+**Mecánicas de combate:**
+- Los enemigos **avisan antes de atacar** (se quedan quietos y parpadean en rojo). Si les pegas
+  en ese momento, su ataque se cancela y se tambalean.
+- Al recibir un golpe te empuja **lejos de quien te pegó** (antes podía lanzarte contra el enemigo).
+- **Agachado** esquivas el hilo de queso de la pizza (pasa por encima). Lo que cae en arco
+  (albóndigas, salsa) sí te alcanza.
+- Pulsar atacar al final de un golpe **encadena** el siguiente; si mantienes una dirección,
+  el golpe sale hacia ese lado.
+- Salto más justo: puedes saltar un instante después de dejar el borde y el salto pulsado
+  justo antes de aterrizar no se pierde.
 
 ## 3. Flujo del juego
 

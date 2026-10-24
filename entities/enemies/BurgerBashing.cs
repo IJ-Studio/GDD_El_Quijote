@@ -29,7 +29,7 @@ public partial class BurgerBashing : Enemy
             _burger = owner;
         }
 
-        public override void PhysicsUpdate(double delta)
+        protected override void ActivePhysics(double delta)
         {
             Vector2 velocity = _burger.Velocity;
             if (!_burger.IsOnFloor())

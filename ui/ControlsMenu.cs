@@ -4,7 +4,7 @@ using Godot;
 
 /// <summary>
 /// Menú de controles: una columna por personaje (Don Quijote y Sancho Panza) donde se
-/// elige la tecla de ataque, defensa e interacción. Se abre como superposición desde el
+/// elige la tecla de cada acción (moverse, saltar, agacharse, atacar, defender, interactuar). Se abre como superposición desde el
 /// menú principal y el de pausa; los cambios se guardan solos (ControlBindings).
 /// </summary>
 public partial class ControlsMenu : Control
@@ -22,7 +22,7 @@ public partial class ControlsMenu : Control
         ProcessMode = ProcessModeEnum.Always;
         SetAnchorsPreset(LayoutPreset.FullRect);
 
-        var dim = new ColorRect { Color = new Color(0, 0, 0, 0.8f), MouseFilter = MouseFilterEnum.Stop };
+        var dim = new ColorRect { Color = new Color(0.05f, 0.04f, 0.03f, 0.94f), MouseFilter = MouseFilterEnum.Stop };
         dim.SetAnchorsPreset(LayoutPreset.FullRect);
         AddChild(dim);
 
@@ -31,7 +31,7 @@ public partial class ControlsMenu : Control
         AddChild(center);
 
         var root = new VBoxContainer();
-        root.AddThemeConstantOverride("separation", 16);
+        root.AddThemeConstantOverride("separation", 14);
         center.AddChild(root);
 
         var title = new Label { Text = "CONTROLES", HorizontalAlignment = HorizontalAlignment.Center };
@@ -49,7 +49,9 @@ public partial class ControlsMenu : Control
         _status = new Label
         {
             Text = "Elige un control y pulsa la tecla nueva (ESC cancela).",
-            HorizontalAlignment = HorizontalAlignment.Center
+            HorizontalAlignment = HorizontalAlignment.Center,
+            AutowrapMode = TextServer.AutowrapMode.WordSmart,
+            CustomMinimumSize = new Vector2(640f, 0f)
         };
         _status.AddThemeFontSizeOverride("font_size", 10);
         root.AddChild(_status);
@@ -72,7 +74,7 @@ public partial class ControlsMenu : Control
     private VBoxContainer BuildColumn(int player, Color nameColor)
     {
         var column = new VBoxContainer { CustomMinimumSize = new Vector2(300f, 0f) };
-        column.AddThemeConstantOverride("separation", 10);
+        column.AddThemeConstantOverride("separation", 6);
 
         var header = new Label
         {
@@ -92,7 +94,7 @@ public partial class ControlsMenu : Control
             label.AddThemeFontSizeOverride("font_size", 11);
             row.AddChild(label);
 
-            var button = new Button { CustomMinimumSize = new Vector2(120f, 0f) };
+            var button = new Button { CustomMinimumSize = new Vector2(130f, 0f) };
             int capturedPlayer = player;
             string capturedAction = action;
             button.Pressed += () => StartListening(capturedPlayer, capturedAction, button);
@@ -141,14 +143,15 @@ public partial class ControlsMenu : Control
                 return;
             }
 
-            if (ControlBindings.TryRebind(listening.Player, listening.Action, code, out string? error))
+            if (ControlBindings.TryRebind(listening.Player, listening.Action, code, out string? message))
             {
                 if (_status is not null)
-                    _status.Text = $"{ControlBindings.PlayerName(listening.Player)}: {ControlBindings.ActionLabel(listening.Action)} = {OS.GetKeycodeString(code)}";
+                    _status.Text = message
+                        ?? $"{ControlBindings.PlayerName(listening.Player)}: {ControlBindings.ActionLabel(listening.Action)} = {ControlBindings.GetKeyLabel(listening.Player, listening.Action)}";
             }
             else if (_status is not null)
             {
-                _status.Text = error ?? "No se pudo asignar esa tecla.";
+                _status.Text = message ?? "No se pudo asignar esa tecla.";
             }
             StopListening();
             return;

@@ -40,7 +40,7 @@ public partial class RunState : Node, IState
             return;
         }
 
-        if (_owner.IsActionJustPressed("jump") && _owner.IsOnFloor())
+        if (_owner.ConsumeJumpRequest())
         {
             _owner.StateMachine.TransitionTo("Jump");
             return;
@@ -49,6 +49,12 @@ public partial class RunState : Node, IState
         if (!_owner.IsOnFloor())
         {
             _owner.StateMachine.TransitionTo("Fall");
+            return;
+        }
+
+        if (_owner.IsActionPressed("crouch"))
+        {
+            _owner.StateMachine.TransitionTo("Crouch");
             return;
         }
 

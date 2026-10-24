@@ -9,6 +9,9 @@ public partial class AttackState : Node, IState
 {
     private Character _owner = null!;
 
+    /// <summary>Se pulsó atacar durante el final del golpe: encadena otro al terminar.</summary>
+    private bool _queued;
+
     public AttackState() { }
     public AttackState(Character owner) => _owner = owner;
 
@@ -24,6 +27,12 @@ public partial class AttackState : Node, IState
 
     public void Enter()
     {
+        _queued = false;
+
+        // Si se está pulsando una dirección, el golpe sale hacia ese lado
+        float direction = _owner.GetAxis("left", "right");
+        if (!Mathf.IsZeroApprox(direction)) _owner.SetFacing(direction < 0 ? -1 : 1);
+
         _owner.Sprite.Play("attack");
         _owner.Sprite.AnimationFinished += OnAnimationFinished;
         if (_owner.Hitbox is not null)
@@ -38,7 +47,11 @@ public partial class AttackState : Node, IState
         AudioManager.Instance?.PlaySfx("ataque", -12f);
     }
 
-    public void Update(double delta) { }
+    public void Update(double delta)
+    {
+        // Buffer de ataque: pulsar en la segunda mitad del golpe encadena el siguiente
+        if (_owner.IsActionJustPressed("attack") && _owner.Sprite.Frame >= 1) _queued = true;
+    }
 
     public void PhysicsUpdate(double delta)
     {
@@ -68,6 +81,13 @@ public partial class AttackState : Node, IState
     {
         if (_owner.Sprite.Animation == "attack")
         {
+            if (_queued)
+            {
+                // Mismo estado: se reinicia a mano (TransitionTo ignora ir al estado actual)
+                Exit();
+                Enter();
+                return;
+            }
             _owner.StateMachine.TransitionTo(_owner.IsOnFloor() ? "Idle" : "Fall");
         }
     }

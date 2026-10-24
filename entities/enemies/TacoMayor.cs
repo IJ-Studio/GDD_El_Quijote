@@ -31,6 +31,12 @@ public partial class TacoMayor : Enemy
     /// <summary>El jefe no se aturde ni pierde su ataque por un golpe: mantiene su ritmo por fases.</summary>
     protected override bool ReactsToHits => false;
 
+    public TacoMayor()
+    {
+        // Aviso más corto que el de los enemigos comunes: el jefe es más rápido
+        AttackWindup = 0.3f;
+    }
+
     private TacoMayorPhase _currentPhase = TacoMayorPhase.Phase1;
     private float _timeSinceAttack = 0f;
     private int _attackCount = 0;
@@ -140,8 +146,8 @@ public partial class TacoMayor : Enemy
     }
 
     /// <summary>
-    /// Puñetazo: animación de ataque con un pequeño impulso hacia el jugador; la Hitbox del jefe
-    /// (que se activa en el estado base) es la que hace el daño.
+    /// Puñetazo: tras el aviso da un impulso hacia el jugador; la Hitbox del jefe
+    /// (que se activa en el golpe del estado base) es la que hace el daño.
     /// </summary>
     private class PunchAttackState : EnemyAttackState
     {
@@ -155,19 +161,24 @@ public partial class TacoMayor : Enemy
         public override void Enter()
         {
             base.Enter();
-            _boss.Velocity = new Vector2(_boss.Facing * _boss.PunchLungeSpeed, _boss.Velocity.Y);
             _boss.ResetAttackTimer();
+        }
+
+        protected override void Strike()
+        {
+            base.Strike();
+            _boss.Velocity = new Vector2(_boss.Facing * _boss.PunchLungeSpeed, _boss.Velocity.Y);
             AudioManager.Instance?.PlaySfx("golpe", -4f);
         }
     }
 
     /// <summary>
-    /// Lanza salsa en arco (fase 2) o ráfaga de salsa (fase 3).
+    /// Lanza salsa en arco: 2 gotas (fase 1), 3 (fase 2) o ráfaga de 4 (fase 3).
+    /// Solo lanza salsa; el cuerpo a cuerpo es del puñetazo.
     /// </summary>
     private class RangedAttackState : EnemyAttackState
     {
         private readonly TacoMayor _boss;
-        private bool _barrageListening;
 
         public RangedAttackState(TacoMayor owner) : base(owner, "attack")
         {
@@ -176,18 +187,15 @@ public partial class TacoMayor : Enemy
 
         public override void Enter()
         {
-            bool barrage = _boss._currentPhase == TacoMayorPhase.Phase3;
-            if (barrage && _boss.Sprite.SpriteFrames?.HasAnimation("barrage") == true)
-            {
-                Owner.Velocity = new Vector2(0, Owner.Velocity.Y);
-                Owner.Sprite.Play("barrage");
-                Owner.Sprite.AnimationFinished += OnBarrageFinished;
-                _barrageListening = true;
-            }
-            else
-            {
-                base.Enter();
-            }
+            bool barrage = _boss._currentPhase == TacoMayorPhase.Phase3
+                           && _boss.Sprite.SpriteFrames?.HasAnimation("barrage") == true;
+            AnimName = barrage ? "barrage" : "attack";
+            base.Enter();
+            _boss.ResetAttackTimer();
+        }
+
+        protected override void Strike()
+        {
             int drops = _boss._currentPhase switch
             {
                 TacoMayorPhase.Phase1 => 2,
@@ -207,23 +215,7 @@ public partial class TacoMayor : Enemy
                 if (projectile != null) projectile.DamageMultiplier = damageMultiplier;
                 projectile?.Launch(_boss.MuzzlePosition, new Vector2(_boss.Facing, -lift));
             }
-            _boss.ResetAttackTimer();
             AudioManager.Instance?.PlaySfx("disparo", -8f);
-        }
-
-        public override void Exit()
-        {
-            if (_barrageListening)
-            {
-                Owner.Sprite.AnimationFinished -= OnBarrageFinished;
-                _barrageListening = false;
-            }
-            base.Exit();
-        }
-
-        private void OnBarrageFinished()
-        {
-            Owner.StateMachine.TransitionTo("Guard");
         }
     }
 
